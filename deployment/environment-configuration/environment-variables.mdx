@@ -1,0 +1,281 @@
+---
+title: "Host & Build Environment Variables"
+description: "Demonstrates configuring environment variables in `vue.config.js`, how to tailor for different environments (development, staging, production), and best practices for secure variable management when deployed to Firebase Hosting."
+---
+
+# Host & Build Environment Variables
+
+This guide helps you configure environment variables in `vue.config.js`, tailor settings for different environments (development, staging, production), and apply best practices for secure variable management when deploying your Aura web app to Firebase Hosting.
+
+---
+
+## 1. Understanding Environment Variables in Aura
+
+Environment variables enable you to customize Aura’s behavior and configuration depending on the context where the app runs. This includes setting API keys, enabling debug modes, or defining URLs relevant to development, staging, and production environments.
+
+Aura leverages Vue CLI’s environment variable management system, allowing you to define variables scoped to specific environments and accessed anywhere in your code using `process.env`.
+
+### Why Environment Variables Matter
+
+- **Separation of Configurations:** Keep development values distinct from production.
+- **Security:** Prevent embedding sensitive info directly in your source code.
+- **Flexibility:** Adjust API endpoints, feature toggles, or analytics keys without code changes.
+
+---
+
+## 2. Configuring Environment Variables with `vue.config.js`
+
+The main build and runtime environment settings for Aura reside in the `vue.config.js` file at your project root. While this file configures webpack and PWA behavior, you will integrate environment variables here and via `.env` files.
+
+### Key Points About `vue.config.js` in Aura
+
+- Controls build-related features such as transpilation and source map generation.
+- Handles caching and service worker injection for offline support.
+- Does not directly store secrets but works in tandem with environment files.
+
+Example snippet from `vue.config.js`:
+
+```js
+module.exports = {
+  chainWebpack: config => {
+    config.plugins.delete('prefetch')
+  },
+  transpileDependencies: ["vuetify"],
+  productionSourceMap: false,
+  pwa: {
+    name: 'Aura Main',
+    workboxPluginMode: 'InjectManifest',
+    themeColor: '#4A90E2',
+    msTileColor: '#4A90E2',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    manifestOptions: {
+      background_color: "#ffffff"
+    },
+    workboxOptions: {
+      swSrc: './src/sw.js',
+      swDest: 'service-worker.js',
+    },
+  }
+}
+```
+
+### How Environment Variables Integrate
+
+You can define variables in dedicated files like `.env.development`, `.env.staging`, `.env.production` and load these automatically depending on your running mode:
+
+- Variables prefixed with `VUE_APP_` will be embedded into the client-side JavaScript.
+
+Example `.env.production`:
+
+```env
+VUE_APP_FIREBASE_API_KEY=your_production_api_key
+VUE_APP_FIREBASE_AUTH_DOMAIN=your_production_auth_domain
+```
+
+---
+
+## 3. Tailoring Environment Variables for Specific Environments
+
+### Setting Up `.env` Files
+
+Create separate `.env` files to keep your environment variables isolated and secure:
+
+| File                | Use Case                          |
+| ------------------- | -------------------------------- |
+| `.env`              | Default variables for all envs    |
+| `.env.development`  | Local development setup           |
+| `.env.staging`      | Pre-production or QA environment  |
+| `.env.production`   | Final production values           |
+
+### Example Variables for Firebase Configuration
+
+```env
+# .env.development
+VUE_APP_FIREBASE_API_KEY=dev-api-key
+VUE_APP_FIREBASE_AUTH_DOMAIN=dev-auth.firebaseapp.com
+
+# .env.production
+VUE_APP_FIREBASE_API_KEY=prod-api-key
+VUE_APP_FIREBASE_AUTH_DOMAIN=prod-auth.firebaseapp.com
+```
+
+### How Vue CLI Uses These
+
+- When running locally with `npm run serve`, `.env.development` is loaded.
+- When building for production with `npm run build`, `.env.production` is loaded.
+
+### Accessing Variables in the Code
+
+Anywhere in your Vue application, you can use:
+
+```js
+const apiKey = process.env.VUE_APP_FIREBASE_API_KEY;
+```
+
+Use this to configure Firebase or any other API keys dynamically based on the environment.
+
+---
+
+## 4. Secure Management of Environment Variables on Firebase Hosting
+
+When you deploy Aura to Firebase Hosting, environment variables must not be exposed in the client bundle unless they are intended to be public.
+
+### Best Practices
+
+- **Do NOT embed sensitive secrets in environment variables prefixed with `VUE_APP_` as these are exposed in the client code.**
+
+- Firebase config keys (like those in `firebaseConfig` in `src/config/firebase.js`) are okay to be public as required by Firebase to initialize the app.
+
+- Handle any sensitive logic server-side or through Firebase Functions if needed.
+
+### Configuring `firebase.json` for Your Hosting Site
+
+The `firebase.json` file controls how Firebase Hosting serves your built app.
+
+Example `firebase.json` snippet:
+
+```json
+{
+  "hosting": {
+    "site": "myaurapp",
+    "public": "dist",
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+- Replace the `site` value with your Firebase Hosting site ID.
+- Ensure your built assets output to `dist` (default Vue CLI build folder).
+
+### Deploying with Environment Awareness
+
+- Build your app with the correct environment using:
+
+```bash
+npm run build
+```
+
+- Deploy with Firebase CLI:
+
+```bash
+firebase deploy
+```
+
+The build will use your environment variables from the appropriate `.env` file, and Firebase Hosting will serve the resulting static assets.
+
+---
+
+## 5. Workflow Example: Setting Up Development and Production Variables
+
+Imagine you want to maintain two Firebase projects: one for development and one for production.
+
+### Steps:
+
+1. **Create `.env.development` with development Firebase config keys:**
+
+```env
+VUE_APP_FIREBASE_API_KEY=devApiKey
+VUE_APP_FIREBASE_AUTH_DOMAIN=dev-project.firebaseapp.com
+```
+
+2. **Create `.env.production` with production Firebase config keys:**
+
+```env
+VUE_APP_FIREBASE_API_KEY=prodApiKey
+VUE_APP_FIREBASE_AUTH_DOMAIN=prod-project.firebaseapp.com
+```
+
+3. **Modify your Firebase init file `src/config/firebase.js` to use these variables:**
+
+```js
+const firebaseConfig = {
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  // other keys as needed
+};
+```
+
+4. **Run locally (development environment):**
+
+```bash
+npm run serve
+```
+
+This loads `.env.development` automatically.
+
+5. **Build for production:**
+
+```bash
+npm run build
+```
+
+This loads `.env.production`, producing a build with the production Firebase config baked in.
+
+6. **Deploy the build (`dist`) to Firebase Hosting:**
+
+```bash
+firebase deploy
+```
+
+You have now securely and flexibly configured environment variables tailored to your deployment environment.
+
+---
+
+## 6. Tips & Common Pitfalls
+
+- ✅ Always prefix environment variable keys with `VUE_APP_` to make them available to the client-side code.
+- ✅ Verify that sensitive information is not prefixed with `VUE_APP_` since it's publicly exposed.
+- ✅ Use `.gitignore` to exclude any secret config files you might want to keep private.
+- ✅ Confirm the right `.env` file is loaded by inspecting `process.env.NODE_ENV` in your app.
+- ✅ When building for production, remember to run `npm run build` to include your production environment variables.
+- ✅ Keep your `firebase.json` updated with the correct `site` value to ensure deployment targets the right Firebase Hosting site.
+
+---
+
+## 7. Troubleshooting
+
+<AccordionGroup title="Troubleshooting Environment Variables">
+<Accordion title="My environment variables aren’t accessible in the app">
+- Check that your variable names start with `VUE_APP_`.
+- Ensure you restarted the dev server (`npm run serve`) after adding new variables.
+- Verify you’re editing the correct `.env` file matching your environment.
+- Use `console.log(process.env)` early in your app to inspect which variables are loaded.
+</Accordion>
+<Accordion title="Sensitive keys appearing in public builds">
+- Avoid putting secrets in `VUE_APP_` variables.
+- Use Firebase security rules or server-side code (Firebase Functions) to handle secrets.
+- Review your `.env` files and source code to remove secret keys.
+</Accordion>
+<Accordion title="Firebase initialization errors after deployment">
+- Double-check the `firebaseConfig` in `src/config/firebase.js` uses environment variables.
+- Confirm your `.env.production` has the correct production values before building.
+- Validate `firebase.json` has the right Hosting `site` value.
+- Clear browser cache and disable service worker temporarily to ensure fresh load.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 8. Additional Resources & Next Steps
+
+- [Vue CLI Environment Variables Documentation](https://cli.vuejs.org/guide/mode-and-env.html)
+- [Firebase Hosting Deployment Guide](https://firebase.google.com/docs/hosting)
+- Related Documentation in Aura:
+  - [Firebase Project Configuration](../environment-configuration/firebase-config-setup)
+  - [Production Build & Deploy](../deployment-workflow/production-build-deploy)
+  - [Deploying to Firebase Hosting](../../getting-started/run-validate-deploy/firebase-deployment)
+
+Maintain consistent environment settings across both Aura Main and Aura Admin for seamless integration and smoother deployment.
+
+---
+
+By mastering environment variables as described here, you'll tailor Aura confidently for any deployment scenario, ensuring security, flexibility, and reliable production readiness.
