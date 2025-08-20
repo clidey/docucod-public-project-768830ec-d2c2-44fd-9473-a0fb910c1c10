@@ -1,0 +1,283 @@
+---
+title: "Optimizing PWA and Offline Experience"
+description: "Best practices and technical steps to ensure Aura delivers the fastest, most reliable offline-enabled experience for your users. Covers service worker configuration, caching strategies, and update patterns."
+---
+
+# Optimizing PWA and Offline Experience
+
+## Overview
+This guide helps you optimize Aura’s Progressive Web App (PWA) and offline capabilities to deliver a fast, reliable, and seamless experience for your users—even when their internet connection is unstable or unavailable. You will learn how to configure the service worker, apply effective caching strategies, and implement update patterns to keep your app fresh while maintaining offline functionality.
+
+---
+
+## Prerequisites
+- Aura source code already cloned and set up.
+- Familiarity with Aura’s basic installation and configuration.
+- Firebase project properly configured (see [Configuring Firebase](../getting-started/configuration-run/firebase-setup)).
+- Vue.js and Vuetify basics for understanding Aura components.
+- Access to modify `vue.config.js`, `src/registerServiceWorker.js`, and the service worker file.
+
+---
+
+## Expected Outcome
+By following this guide, you will:
+- Enable Aura’s offline-first experience using service worker caching.
+- Configure caching strategies to optimize performance and reliability.
+- Provide a smooth app update mechanism, prompting users when a new version is available.
+- Ensure continuous access to content even without internet connectivity.
+
+### Time Estimate
+Approximately 30-45 minutes
+
+### Difficulty Level
+Intermediate — requires understanding of PWA concepts and service worker registration.
+
+---
+
+## Understanding Aura’s Offline Architecture
+Aura’s PWA offline experience relies on its service worker, implemented via Workbox, which manages caching and update workflows:
+
+- **Service Worker Registration:** Registered in `src/registerServiceWorker.js`, it manages lifecycle events and triggers update checks hourly.
+- **Caching Assets:** Static assets and content are precached using Workbox with a custom service worker (`src/sw.js`).
+- **Update Detection & UI:** When a new version of the app is detected, Aura dispatches a custom event (`swUpdated`) caught by the main app to notify users with a refresh prompt.
+
+This combined architecture balances performance, offline reliability, and user control over updates.
+
+---
+
+## Step-by-Step Guide
+
+<Steps>
+<Step title="Verify PWA Plugin Configuration">
+Ensure your `vue.config.js` is configured to enable PWA features with Workbox setup:
+
+```js
+module.exports = {
+  pwa: {
+    name: 'Aura Main',
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      swSrc: './src/sw.js',
+      swDest: 'service-worker.js',
+    },
+    themeColor: '#4A90E2',
+    msTileColor: '#4A90E2',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    manifestOptions: {
+      background_color: "#ffffff"
+    },
+  }
+}
+```
+
+**What to expect:** The PWA plugin will inject your custom service worker source (`sw.js`) during build, enabling custom caching strategies.
+
+**Tip:** Do not remove the `InjectManifest` mode as it allows fine control over the caching behavior.
+</Step>
+
+<Step title="Review and Customize Your Service Worker">
+Your `src/sw.js` is the heart of caching logic. Confirm it handles important events and caching properly.
+
+```js
+self.addEventListener('message', (e) => {
+  if (!e.data) return;
+  switch (e.data) {
+    case 'skipWaiting':
+      self.skipWaiting();
+      break;
+  }
+});
+
+workbox.core.setCacheNameDetails({
+  prefix: "cache"
+});
+
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+```
+
+- The code listens for a `skipWaiting` message to force the new service worker to activate.
+- `precacheAndRoute` caches app shell and assets for offline use.
+
+**Action:** Extend caching strategies here as needed (e.g., runtime caching for API calls).
+
+**Tip:** Ensure all critical resources (JS, CSS, fonts, images) are included in precache manifest.
+</Step>
+
+<Step title="Enable and Monitor Service Worker Registration">
+In `src/registerServiceWorker.js`, ensure registration is active and configured to listen for updates every hour:
+
+```js
+import { register } from 'register-service-worker'
+
+if (process.env.NODE_ENV === 'production') {
+  register(`${process.env.BASE_URL}service-worker.js`, {
+    registered (registration) {
+      setInterval(() => {
+        registration.update();
+      }, 1000 * 60 * 60); // Check for updates hourly
+    },
+    updated (registration) {
+      document.dispatchEvent(
+        new CustomEvent('swUpdated', { detail: registration })
+      );
+    },
+    offline () {
+      console.log('App running offline.')
+    },
+    error (error) {
+      console.error('Service worker registration error:', error)
+    }
+  })
+}
+```
+
+- The `updated` callback dispatches the `swUpdated` event.
+- Regular checks ensure the app stays current without user intervention.
+
+**Verification:** Open your console in production mode and verify logs after registration.
+</Step>
+
+<Step title="Implement Update Notification UX">
+Aura’s `src/App.vue` listens for `swUpdated` to show a user prompt with a 'Refresh' button:
+
+- The snackbar appears with the message 'New version available!' and a Refresh button.
+- Clicking Refresh sends a `skipWaiting` message to service worker to instantly activate the new version.
+
+Check the relevant code snippet:
+
+```js
+created() {
+  document.addEventListener('swUpdated', this.showRefreshUI, { once: true });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (this.refreshing) return;
+    this.refreshing = true;
+    window.location.reload();
+  });
+},
+methods: {
+  showRefreshUI(e) {
+    this.registration = e.detail;
+    this.snackBtnText = 'Refresh';
+    this.snackWithBtnText = 'New version available!';
+    this.snackWithButtons = true;
+  },
+  refreshApp() {
+    this.snackWithButtons = false;
+    if (!this.registration || !this.registration.waiting) return;
+    this.registration.waiting.postMessage('skipWaiting');
+  },
+}
+```
+
+**Action:** Review your app UI to ensure users get a clear and actionable update prompt.
+
+**Best Practice:** Keep the refresh prompt visible long enough for users to notice and act.
+</Step>
+
+<Step title="Optimize Caching Strategy for Performance and Freshness">
+Consider caching strategies that work best for your content:
+
+- **Precache Static Assets:** Use `precacheAndRoute` to store core assets.
+- **Runtime Caching for API or Dynamic Content:** Extend your service worker to use Workbox runtime caching strategies such as `StaleWhileRevalidate` or `CacheFirst`.
+
+Example runtime caching snippet to add inside `src/sw.js`:
+
+```js
+workbox.routing.registerRoute(
+  ({request}) => request.destination === 'script' || request.destination === 'style',
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'static-resources-cache'
+  })
+);
+
+workbox.routing.registerRoute(
+  /https:\/\/firestore.googleapis.com\/v1\/.*/,
+  new workbox.strategies.NetworkFirst({
+    cacheName: 'api-cache'
+  })
+);
+```
+
+**Tip:** Choose caching strategies depending on resource volatility — use CacheFirst for unchanging resources and NetworkFirst or StaleWhileRevalidate for dynamic data.
+
+**Warning:** Excessive caching of dynamic or sensitive data can cause stale or incorrect displays.
+</Step>
+</Steps>
+
+---
+
+## Troubleshooting & Tips
+
+<AccordionGroup title="Common Issues and Solutions">
+<Accordion title="Service Worker Not Registering">
+Verify your app runs in production mode and service workers are only registered in production. Check browser console for registration errors, inspect the `service-worker.js` file for path issues.
+</Accordion>
+<Accordion title="App Does Not Update After Deploy">
+Ensure the update event triggers the refresh prompt. If stale content persists, try:
+- Manually unregister service workers in browser dev tools.
+- Confirm new service worker files were deployed.
+- Verify `skipWaiting` message is sent and received.
+</Accordion>
+<Accordion title="Offline Mode Not Working">
+- Confirm caching of essential assets.
+- Test with dev tools offline toggle to simulate offline.
+- Check service worker cache names and network routing rules.
+</Accordion>
+<Accordion title="Frequent Update Prompts Annoy Users">
+- Debounce or throttle update checks.
+- Adjust custom messaging UI for less intrusive notifications.
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+To build trust and smooth user experience, always test your PWA functionality on different devices and network conditions. Use Chrome DevTools Application tab’s “Service Workers” and “Offline” throttling features.
+</Tip>
+
+---
+
+## Next Steps & Related Content
+
+- **Deploying Aura to Firebase:** [Deploying Aura to Firebase: A Step-by-Step Guide](../guides/getting-started-workflows/deploying-aura-to-firebase)
+- **Configuring Firebase:** Set up Firestore offline persistence and Firebase Messaging in [Configuring Firebase](../getting-started/configuration-run/firebase-setup)
+- **Understanding Aura’s Structure:** Learn about page routing and data loading [Understanding Aura’s Structure & Page Navigation](../guides/getting-started-workflows/understanding-aura-structure-and-navigation)
+- **Troubleshooting:** Solve common PWA and service worker problems at [Troubleshooting Common Issues](../getting-started/troubleshooting-validation/common-issues)
+
+**Explore advanced caching and branding options:** See [Branding and Theme Advanced](../guides/advanced-customization-and-optimization/branding-and-theme-advanced)
+
+
+---
+
+## Summary Diagram: Offline and Update Flow in Aura
+
+```mermaid
+flowchart TD
+  Start([App Launch]) --> CheckSW["Check Service Worker Registration"]
+  CheckSW --> SWReg["Service Worker Registered?"]
+  SWReg -->|No| NoOffline["No offline support"]
+  SWReg -->|Yes| Cached["Content Cached for Offline Use"]
+
+  Cached --> ListenUpdate["Listen for swUpdated Event"]
+  ListenUpdate --> ShowPrompt["Show 'New version available' Prompt"]
+  ShowPrompt --> UserAction{User Clicks "Refresh"?}
+  UserAction -->|No| WaitUser["Wait"]
+  UserAction -->|Yes| SendMessage["Send skipWaiting Message to SW"]
+  SendMessage --> SWUpdate["Service Worker Activates New Version"]
+  SWUpdate --> Reload["Page Reloads"]
+  Reload --> Start
+
+  %% Offline Handling
+  Cached --> OfflineMode["App Runs in Offline Mode"]
+
+  %% Update Polling
+  SWReg --> Polling["Hourly Update Check"]
+  Polling --> ListenUpdate
+
+  classDef decision fill:#f9f,stroke:#333,stroke-width:2px;
+  class UserAction decision;
+```
+
+This flow shows the core lifecycle of how Aura leverages its service worker to cache content, listen for updates, notify users, and refresh the app efficiently.
+
+---
