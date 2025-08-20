@@ -1,0 +1,149 @@
+{
+  "background": {
+    "decoration": "gradient"
+  },
+  "colors": {
+    "dark": "#1E3A8A",
+    "light": "#60A5FA",
+    "primary": "#60A5FA"
+  },
+  "favicon": "/favicon.svg",
+  "fonts": {
+    "family": "Montserrat",
+    "format": "woff2",
+    "source": "https://fonts.gstatic.com/s/googlesansflex/v5/t5sJIQcYNIWbFgDgAAzZ34auoVyXkJCOvp3SFWJbN5hF8Ju1x6sKCyp0l9sI40swNJwGpVd4AZzz0v6lJ4qFXNZhGjLvDSkV4USKMo6qQzwliVdHAy9jxTDHg_ugnAakpwGc-cxgUqDCIUI.woff2"
+  },
+  "icons": {
+    "library": "fontawesome"
+  },
+  "logo": {
+    "dark": "./logo/logo.svg",
+    "light": "./logo/logo.svg"
+  },
+  "name": "Aura",
+  "navigation": {
+    "tabs": [
+      {
+        "groups": [
+          {
+            "group": "Product Introduction \u0026 Value",
+            "pages": [
+              "overview/intro-value/product-overview",
+              "overview/intro-value/target-audience-usecases"
+            ]
+          },
+          {
+            "group": "System Architecture \u0026 Integration",
+            "pages": [
+              "overview/architecture-system/system-architecture",
+              "overview/architecture-system/integration-overview"
+            ]
+          },
+          {
+            "group": "Core Features \u0026 Key Concepts",
+            "pages": [
+              "overview/core-features-concepts/quick-features",
+              "overview/core-features-concepts/core-concepts-terminology"
+            ]
+          }
+        ],
+        "tab": "Overview"
+      },
+      {
+        "groups": [
+          {
+            "group": "Preparation \u0026 System Requirements",
+            "pages": [
+              "getting-started/preparation/prerequisites",
+              "getting-started/preparation/system-requirements"
+            ]
+          },
+          {
+            "group": "Installation \u0026 Setup",
+            "pages": [
+              "getting-started/installation/getting-the-code",
+              "getting-started/installation/installing-dependencies",
+              "getting-started/installation/first-project-setup"
+            ]
+          },
+          {
+            "group": "Configuration \u0026 First Run",
+            "pages": [
+              "getting-started/configuration-run/firebase-setup",
+              "getting-started/configuration-run/local-run",
+              "getting-started/configuration-run/production-build"
+            ]
+          },
+          {
+            "group": "Troubleshooting \u0026 Validation",
+            "pages": [
+              "getting-started/troubleshooting-validation/common-issues",
+              "getting-started/troubleshooting-validation/first-validation"
+            ]
+          }
+        ],
+        "tab": "Getting Started"
+      },
+      {
+        "groups": [
+          {
+            "group": "Getting Started \u0026 Core Workflows",
+            "pages": [
+              "guides/getting-started-workflows/deploying-aura-to-firebase",
+              "guides/getting-started-workflows/initial-configuration-and-theme-setup",
+              "guides/getting-started-workflows/understanding-aura-structure-and-navigation"
+            ]
+          },
+          {
+            "group": "Managing Content: Events, Team, and Blogs",
+            "pages": [
+              "guides/managing-content-events-team/publishing-and-managing-events",
+              "guides/managing-content-events-team/showcasing-team-and-speakers",
+              "guides/managing-content-events-team/managing-and-featuring-blogs"
+            ]
+          },
+          {
+            "group": "Advanced Customization \u0026 Optimization",
+            "pages": [
+              "guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support",
+              "guides/advanced-customization-and-optimization/branding-and-theme-advanced"
+            ]
+          }
+        ],
+        "tab": "Guides"
+      },
+      {
+        "groups": [
+          {
+            "group": "Deployment Essentials",
+            "pages": [
+              "deployment/deployment-essentials/environment-configuration",
+              "deployment/deployment-essentials/production-build",
+              "deployment/deployment-essentials/firebase-hosting-deployment"
+            ]
+          },
+          {
+            "group": "Operations \u0026 Maintenance",
+            "pages": [
+              "deployment/operations-and-maintenance/monitoring-and-logging",
+              "deployment/operations-and-maintenance/scaling-and-performance",
+              "deployment/operations-and-maintenance/backup-and-disaster-recovery"
+            ]
+          },
+          {
+            "group": "Security Hardening",
+            "pages": [
+              "deployment/security-hardening/firebase-security-setup",
+              "deployment/security-hardening/application-security-best-practices"
+            ]
+          }
+        ],
+        "tab": "Deployment"
+      }
+    ]
+  },
+  "styling": {
+    "codeblocks": "dark",
+    "eyebrows": "breadcrumbs"
+  }
+}
