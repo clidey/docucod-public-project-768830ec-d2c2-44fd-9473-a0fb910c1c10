@@ -1,0 +1,220 @@
+---
+title: "Production Build & Deploy"
+description: "A hands-on guide for building and deploying Aura to Firebase Hosting. Covers project building, updating configuration, preparing the `dist` directory, and running the deployment command. Includes troubleshooting for common build and upload issues."
+---
+
+# Production Build & Deploy
+
+Deploying Aura for your tech community requires a well-orchestrated process that transforms the development codebase into a fast, optimized, and fully functional production web application. This guide walks you through the critical steps of building Aura’s production-ready assets, preparing necessary configuration updates, handling the deployment directory, and using the Firebase CLI to publish your site to Firebase Hosting.
+
+## Why This Matters
+
+Building for production optimizes your app’s performance, reduces load times, enables offline capabilities through service workers, and ensures your community’s content is reliably available on the web. Deployment wraps that build into a seamless upload and hosting experience, transforming your local environment into a public-facing hub ready to engage your users.
+
+---
+
+## 1. Preparing for the Production Build
+
+Before you build, verify your environment is properly set up and configured:
+
+- Your Firebase project is correctly linked and configured.
+- The core Firebase credentials are updated in `src/config/firebase.js`.
+- Any Firebase Hosting settings, especially the `firebase.json` site property, reflect the correct Hosting site ID.
+- Environment variables and project-specific customizations (like theme or branding) are finalized.
+
+If unsure about these, consult the [Deployment Prerequisites](../deployment-workflow/deployment-prerequisites) and [Firebase Project Configuration](../environment-configuration/firebase-config-setup) guides.
+
+<Tip>
+Keeping the Firebase project consistent between Aura Main and Aura Admin is crucial to ensure data synchronization and smooth deployment.
+</Tip>
+
+---
+
+## 2. Building the Production Version
+
+Run the following command in your Aura project root directory to build the production package:
+
+```bash
+npm run build
+```
+
+### What Happens?
+
+- Vue CLI compiles your app and all dependencies into static files.
+- The output is minimized and optimized for performance.
+- The build directory `dist` is generated, containing the entire deployable app.
+- Service worker integration is included via Workbox for offline support.
+
+#### Verifying the Build
+
+After completion, verify:
+
+- `dist/index.html` exists.
+- Static folders like `js`, `css`, and `img` are created.
+- The build completed without errors in the terminal.
+
+If you encounter build issues, review logs carefully. Common causes include missing dependencies, syntax errors, or misconfigured environment variables.
+
+<Warning>
+Always run a fresh build before deploying. Deploying outdated or incomplete builds can cause your app to malfunction or present stale content.
+</Warning>
+
+---
+
+## 3. Configuring Firebase Hosting for Deployment
+
+The deployment process depends on the `firebase.json` file that instructs Firebase Hosting how to serve your app.
+
+### Essential Firebase Hosting Settings
+
+Ensure your `firebase.json` contains:
+
+```json
+{
+  "hosting": {
+    "site": "your_firebase_hosting_site_id",
+    "public": "dist",
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+- Replace `your_firebase_hosting_site_id` with your Firebase Hosting site name, found in your Firebase Console Hosting dashboard.
+- Setting `public` to `dist` points to your freshly built assets.
+- The `rewrites` directive enables client-side routing support.
+
+<Tip>
+Use the Firebase Console Hosting page to confirm your Site ID if you're unsure what to enter.
+</Tip>
+
+---
+
+## 4. Deploying Using Firebase CLI
+
+With your build ready and hosting configured, deploy your app by running:
+
+```bash
+firebase deploy
+```
+
+### Deployment Flow
+
+- Firebase CLI authenticates using your login.
+- Uploads the `dist` directory contents to Firebase Hosting.
+- Adjusts hosting rules based on your `firebase.json`.
+- Provides a live URL where your community app is accessible.
+
+#### Confirming Deployment Success
+
+- After deployment, note the hosting URL presented in the terminal.
+- Visit the URL in your browser and verify the site loads correctly.
+- Test navigation, offline support, and content visibility.
+
+<Check>
+If you see stale content after deployment, clear your browser cache or reload with cache bypass (Ctrl+Shift+R / Cmd+Shift+R).
+</Check>
+
+---
+
+## 5. Troubleshooting Common Build and Deployment Issues
+
+<AccordionGroup title="Common Issues During Build & Deploy">
+<Accordion title="1. Build Failures or Errors">
+- Verify all dependencies are installed: run `npm install` again.
+- Check environment variables and Firebase config values in place.
+- Review error messages for missing imports or syntax issues.
+- Consider deleting `node_modules` and reinstalling fresh.
+</Accordion>
+<Accordion title="2. Firebase CLI Authentication Problems">
+- Ensure you are logged in: run `firebase login`.
+- Check that the `firebase` CLI is installed and updated (`npm install -g firebase-tools`).
+- Confirm the active project matches your Firebase Hosting project (`firebase use`).
+</Accordion>
+<Accordion title="3. Incorrect or Missing Hosting Site ID">
+- Verify the site ID in `firebase.json` matches your Firebase Console Hosting site.
+- If you changed the site ID, clean build and deploy again.
+</Accordion>
+<Accordion title="4. Service Worker Not Updating or Offline Issues">
+- After deployment, inform users to refresh the page to receive the latest service worker.
+- Check the console logs for service worker registration messages.
+- Use incognito/private window or clear cache when testing updates.
+</Accordion>
+<Accordion title="5. Blank or 'Site Not Configured' Message on Load">
+- Confirm Firebase config credentials in `src/config/firebase.js` are current and correct.
+- Ensure Firestore and other Firebase services are accessible and permissions are set.
+- Validate build completed successfully and `dist` contains valid files.
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Consult the [Troubleshooting Setup & Common Issues](../../getting-started/run-validate-deploy/setup-troubleshooting) guide for detailed problem-solving workflows.
+</Tip>
+
+---
+
+## 6. Next Steps & Best Practices
+
+- Regularly rebuild and redeploy after any significant change to your project for consistency.
+- Monitor your Firebase Hosting status and logs via the Firebase Console.
+- Use caching wisely and verify service worker updates to avoid stale content.
+- Automate deployment in CI/CD pipelines for repeatable, reliable releases.
+
+For more detailed workflows, consult:
+- [Deployment Prerequisites](../deployment-workflow/deployment-prerequisites)
+- [Firebase Project Configuration](../environment-configuration/firebase-config-setup)
+- [Running & Validating Locally](../../getting-started/run-validate-deploy/local-run-validation)
+- [Troubleshooting Deployment](../operations-monitoring-maintenance/troubleshooting-deployment)
+
+---
+
+Thank you for deploying Aura! Your community’s robust, fast, and SEO-optimized digital presence is now live, ready to inspire and engage tech enthusiasts globally.
+
+
+---
+
+### Mermaid Diagram of Deployment Workflow
+
+```mermaid
+flowchart TD
+  A[Fork & Clone Aura Repository] --> B[Configure Firebase Project]
+  B --> C[Update Firebase Config in Code]
+  C --> D[Run npm install]
+  D --> E[Build Production Assets (npm run build)]
+  E --> F[Verify dist Directory & Config Files]
+  F --> G[Update firebase.json site ID]
+  G --> H[Deploy to Firebase Hosting (firebase deploy)]
+  H --> I{Deployment Successful?}
+  I -->|Yes| J[Visit Live Site & Verify]
+  I -->|No| K[Review Logs & Troubleshoot]
+  K --> D
+
+  subgraph Local Environment Setup
+    A
+    B
+    C
+    D
+  end
+
+  subgraph Production Build & Deploy
+    E
+    F
+    G
+    H
+    I
+    J
+    K
+  end
+
+  classDef success fill:#d4edda,stroke:#155724,color:#155724;
+  classDef failure fill:#f8d7da,stroke:#721c24,color:#721c24;
+  class J success;
+  class K failure;
+```
