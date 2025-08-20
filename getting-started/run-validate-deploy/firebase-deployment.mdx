@@ -1,0 +1,202 @@
+---
+title: "Deploying to Firebase Hosting"
+description: "Provides a guided sequence for building the production version, configuring firebase.json, initiating deployment, and validating that the app is live. Clarifies common deployment blockers for new users."
+---
+
+# Deploying to Firebase Hosting
+
+This guide provides clear, actionable steps to deploy your Aura web application to Firebase Hosting. You will learn how to build the production version of Aura, configure Firebase hosting settings, deploy the app using Firebase CLI, and verify that your app is live and running correctly.
+
+---
+
+## 1. Prerequisites & Preparations
+
+Before deploying, ensure you have completed the following:
+
+- **Firebase Project Setup:** You must have a Firebase project created in the Firebase Console with Hosting enabled.
+- **Firebase CLI Installed:** Install the Firebase CLI globally by running:
+  ```bash
+  npm install -g firebase-tools
+  ```
+- **Authenticated with Firebase:** Login to your Firebase account with:
+  ```bash
+  firebase login
+  ```
+- **Proper Configuration Files:** Ensure your `firebase.json` contains the correct site ID and settings.
+- **Production Build Ready:** Your Aura app should be built and ready in the `dist` folder.
+
+<Tip>
+Make sure the Firebase Hosting site ID in your `firebase.json` matches the site ID from your Firebase Console Hosting section exactly. This link guides Firebase where to deploy your app.
+</Tip>
+
+---
+
+## 2. Build Your Production Version
+
+Build the optimized production-ready static files using npm:
+
+```bash
+npm run build
+```
+
+- This generates the `dist/` directory containing the static app files.
+- The build process ensures your app is minified, optimized, and includes the necessary service worker files for offline support.
+
+<Check>
+Confirm the `dist/` folder is created and contains files including `index.html`, `service-worker.js`, and your static assets.
+</Check>
+
+---
+
+## 3. Configure Firebase Hosting
+
+Update your `firebase.json` to specify your Firebase Hosting site ID and deployment settings.
+
+Here is an example structure:
+
+```json
+{
+  "hosting": {
+    "site": "Your_Firebase_Hosting_Site_ID",
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+### Steps:
+
+1. Open `firebase.json` in your Aura project root.
+2. Replace `Your_Firebase_Hosting_Site_ID` with your actual Hosting site ID from Firebase Console (it looks like your project ID).
+3. Ensure `public` points to `dist` where your build files are located.
+4. The rewrite rule ensures single-page app routing works correctly.
+
+<Tip>
+If unsure of the Hosting Site ID, check the Firebase Console under Hosting or the URL domain before ".web.app" or ".firebaseapp.com".
+</Tip>
+
+---
+
+## 4. Deploy the Application
+
+Deploy your app to Firebase Hosting using the Firebase CLI:
+
+```bash
+firebase deploy
+```
+
+### What happens here:
+
+- Firebase CLI uploads static files from the `dist` directory.
+- The deployed app becomes accessible under your Firebase Hosting domain.
+
+<Check>
+Watch the CLI output to confirm there are no errors and successful hosting deployment messages.
+</Check>
+
+---
+
+## 5. Verify Your Deployment
+
+After deployment is successful:
+
+1. Open your web browser and visit your Firebase Hosting URL, for example:
+   - `https://your-project-id.web.app`
+   - or `https://your-project-id.firebaseapp.com`
+
+2. Confirm that the Aura app loads correctly with expected content, including home page, events, teams, speakers, etc.
+3. Use Chrome DevTools or similar to verify the service worker is registered (under Application tab).
+4. Check console logs for errors.
+
+<Warning>
+If the page shows a blank screen or routing errors, double-check your `firebase.json` rewrites and ensure the build was successful.
+</Warning>
+
+---
+
+## 6. Common Deployment Blockers & Troubleshooting
+
+### Issue: `firebase deploy` fails or hangs
+- **Solution:** Ensure you are logged in (`firebase login`). Check network connectivity.
+- Verify your Firebase CLI version is up to date: 
+  ```bash
+  firebase --version
+  ```
+- Ensure you are in the correct project directory with valid `firebase.json` and `.firebaserc`.
+
+### Issue: Site ID mismatch
+- Double-check the `site` in `firebase.json` matches exactly what Firebase Console shows for Hosting.
+
+### Issue: Service Worker not activating / offline support issues
+- Confirm your production build includes `service-worker.js`.
+- Clear browser cache to avoid stale files.
+
+### Issue: Routing is broken (404 on client routes)
+- Ensure your `rewrites` rule in `firebase.json` directs all routes to `/index.html`.
+
+<Tip>
+Check [Troubleshooting Common Issues](../run-validate-deploy/setup-troubleshooting) for deeper debugging steps if you encounter deployment failures.
+</Tip>
+
+---
+
+## Next Steps
+
+Once deployed and verified:
+
+- Explore [Monitoring & Logging](../../deployment/runtime-operations/monitoring-logging) to track usage and errors.
+- Optimize your app with caching and offline features detailed in [Optimizing PWA and Offline Support](../../guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support).
+- Customize your branding via [Branding and Theme Advanced](../../guides/advanced-customization-and-optimization/branding-and-theme-advanced).
+
+For continuous integration and updates, rebuild and deploy after each change to keep your live site current.
+
+---
+
+## Additional Resources
+
+- [Firebase Hosting Documentation](https://firebase.google.com/docs/hosting)
+- [Aura Production Build Guide](../configuration-run/production-build)
+- [Running Aura Locally & Quick Validation](../run-validate-deploy/local-run-validation)
+
+---
+
+## Summary
+Deploying Aura to Firebase Hosting involves building your production app, configuring your Firebase Hosting settings precisely, deploying via Firebase CLI, and verifying the live app for correctness and offline support. Common blockers typically relate to misconfiguration of site IDs, build artifacts, or routing in hosting. Follow this guide step-by-step to achieve a successful deployment.
+
+---
+
+## Example Deployment Commands Recap
+
+```bash
+# Install Firebase CLI globally
+npm install -g firebase-tools
+
+# Authenticate Firebase CLI
+firebase login
+
+# Build Aura for production
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy
+```
+
+---
+
+Your Aura web app is now live and ready to welcome your community. Congratulations!
+
+---
+
+<Info>
+This documentation focuses on Aura's deployment step specifically. For full setup and configuration, please consult related getting-started and configuration guides.
+</Info>
