@@ -1,0 +1,186 @@
+---
+title: "Managing and Featuring Blogs"
+description: "Step-by-step workflow for aggregating and displaying blog posts (e.g., Medium articles), keeping your website content-rich and SEO-friendly. Includes tips for theming, responsiveness, and maximizing visibility."
+---
+
+# Managing and Featuring Blogs
+
+Aura empowers your community website by seamlessly aggregating and displaying blogs — specifically, Medium articles — to keep your site content-rich, engaging, and SEO-friendly. This guide walks you through the practical workflow to integrate blog posts into your site, enhance their visibility through theming best practices, and ensure responsiveness across devices.
+
+---
+
+## 1. Workflow Overview
+
+### What This Guide Covers
+This documentation explains how to showcase blog articles on your Aura site by fetching and displaying Medium feeds. You will learn how the Blogs page is structured, how blogs are aggregated, and how to effectively present them with thematic consistency and responsive design.
+
+### Prerequisites
+- Access to your Aura project codebase with the default configuration connecting to Medium blogs.
+- Valid Medium blog RSS URL configured in the general settings (`config.generalConfig.blogs.medium`).
+- Basic understanding of Vue.js component integration and routing.
+
+### Expected Outcome
+After completing this guide, you will have the Blogs page operational, displaying a curated list of blog posts fetched dynamically from Medium, styled cohesively with the site theme, and optimized for desktop and mobile users.
+
+### Time Commitment
+Approximately 20-30 minutes to review, configure, and test the blogs display.
+
+### Difficulty Level
+Intermediate — Familiarity with Vue.js components and project structure is beneficial.
+
+---
+
+## 2. Understanding the Blogs Page Structure
+
+### Page Composition
+The Blogs page (`src/views/Blogs.vue`) is split into two primary components:
+
+- `BlogsHeader`: Displays a simple, styled title area (“Blogs”).
+- `BlogsDetails`: Handles fetching and rendering the list of blog articles from Medium.
+
+Both components use Vuetify grid layouts to maintain responsive design and spacing.
+
+### Route and Navigation
+- The `/blogs` path is defined in the router (`src/router/index.js`) to load the Blogs page.
+- Navigation items include a link to Blogs with icon `mdi-blogger`, integrated into the primary menu.
+
+### Component Highlights
+**BlogsHeader:**
+- Renders a large, visually distinct header for the page.
+
+**BlogsDetails:**
+- On mount, it triggers `getMediumBlogs()` which fetches the Medium RSS feed URL set in your configuration.
+- Shows loading skeleton placeholders while data is being retrieved.
+- Displays blog cards (`BlogCard` components) with the top items from Medium.
+- Provides a direct link to the full Medium blog page for extended reading.
+
+<Tip>
+Understanding this separation allows you to customize the header and content independently with minimal risk.
+</Tip>
+
+---
+
+## 3. Step-by-Step Instructions to Set Up and Customize
+
+<Steps>
+<Step title="Verify Medium Blog URL in Configuration">
+Ensure your `config.generalConfig.blogs.medium` contains the correct Medium RSS feed URL for your blog. This is essential as the BlogsDetails component relies on this to fetch blog data.
+
+- Navigate to your app’s store or settings where the general config is set.
+- Confirm that the Medium blog URL is accurate and publicly accessible.
+- If you need to change the blog source, update this URL accordingly.
+
+<Check>
+If the blog URL is missing or incorrect, no blogs will load, and users will see a 'Blogs Not Found' message.
+</Check>
+</Step>
+
+<Step title="Understanding and Modifying BlogsHeader">
+- Locate `src/components/blogs/BlogsHeader.vue`.
+- Adjust the header text, styles, or typography to align with your branding.
+- The current setup uses Vuetify containers and Vuetify typography for a clean presentation.
+
+<Info>
+This component is straightforward, so feel free to add subtext or links if you want.
+</Info>
+</Step>
+
+<Step title="Customizing Blog Retrieval and Display in BlogsDetails">
+- Open `src/components/blogs/BlogsDetails.vue`.
+- Note that on mounting, the `getMediumBlogs()` function fetches blog content asynchronously.
+- Loading placeholders improve UX during the fetch.
+- Blog entries are presented with `BlogCard` components with responsive grid layout.
+
+You can:
+- Adjust the number of blog posts shown by modifying the iteration count in the template.
+- Customize the `BlogCard` component for detailed layouts, adding dates, author info, or tags.
+
+<Warning>
+Avoid fetching excessive posts to prevent performance issues—limit the display to top articles.
+</Warning>
+</Step>
+
+<Step title="Theming and Responsiveness Best Practices">
+- Vuetify’s grid system guarantees good layout across devices; ensure no conflicting CSS overrides this.
+- The dark mode adapts the background and card colors automatically, consult the `theme.isDark` reactive variable.
+- Use scoped CSS or Vuetify's theming features to maintain consistent colors and fonts.
+
+<Tip>
+Review the Vuetify documentation on responsive grids and dark themes for advanced theming needs.
+</Tip>
+</Step>
+
+<Step title="Navigate to Blogs in Your App">
+- Start your app in development mode or production.
+- Use the main navigation menu to select Blogs.
+- Confirm that the top blogs from Medium appear in a clean card layout.
+- Validate that clicking the 'Medium' link opens the full blog feed externally.
+
+<Check>
+If blogs do not display, check browser console logs for fetch or CORS errors.
+</Check>
+</Step>
+</Steps>
+
+---
+
+## 4. Examples & Customizations
+
+### Sample Medium RSS URL Format
+```
+https://medium.com/feed/@yourusername
+```
+
+### Display Customization
+If you want to limit blogs to the top 5, edit this snippet in `BlogsDetails.vue`:
+```vue
+<v-col v-for="(item,i) in blogsData.items.slice(0,5)" :key="i">
+  <BlogCard :data="{data:item}" />
+</v-col>
+```
+
+### Adding Publish Dates in Blog Cards
+Modify the `BlogCard` component template to include:
+```vue
+<p class="publish-date">{{ new Date(data.data.pubDate).toLocaleDateString() }}</p>
+```
+
+### Responsive Behavior
+The existing code uses Vuetify grid breakpoints (`md`, `lg`, `sm`, `cols`) ensuring cards reposition appropriately on mobile and desktop.
+
+---
+
+## 5. Troubleshooting & Tips
+
+### Common Issues
+- **No blogs shown:** Check that the Medium RSS URL is correct and publicly accessible.
+- **Loading spinner stays indefinitely:** Network issues or API fetch problems; check browser console and network tab.
+- **Broken layout on small screens:** Verify Vuetify grid classes and override any custom CSS impacting responsiveness.
+
+### Best Practices
+- Use skeleton loaders as implemented to inform users during data fetch.
+- Limit number of blogs shown to optimize load times.
+- Cache results at the service level if fetching frequently.
+- Use descriptive titles and link texts to improve SEO.
+
+### Performance Considerations
+- Avoid heavy DOM rendering by paginating or lazy loading blog entries if your Medium feed grows longer.
+
+### Alternative Approaches
+- Instead of direct RSS fetch, use a backend service to convert and cache Medium feeds.
+- Customize blog sourcing to include multiple platforms or your own CMS.
+
+---
+
+## 6. Next Steps & Related Content
+
+- To integrate blogs with your event promotions, see [Publishing and Managing Events](/guides/managing-content-events-team/publishing-and-managing-events).
+- Enhance team and speaker pages for comprehensive content alongside blogs: [Showcasing Team Members & Speakers](/guides/managing-content-events-team/showcasing-team-and-speakers).
+- Optimize for offline access with PWA capabilities in [Optimizing PWA and Offline Experience](/guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support).
+- Troubleshoot fetch or display issues with [Troubleshooting Common Issues](/getting-started/troubleshooting-validation/common-issues).
+
+---
+
+For more detailed architectural insights and navigation understanding, consult [Understanding Aura’s Structure & Page Navigation](/guides/getting-started-workflows/understanding-aura-structure-and-navigation).
+
+---
