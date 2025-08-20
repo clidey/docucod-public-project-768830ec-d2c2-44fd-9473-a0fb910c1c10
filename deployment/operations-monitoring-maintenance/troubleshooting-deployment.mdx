@@ -1,0 +1,168 @@
+---
+title: "Troubleshooting Deployment & Common Issues"
+description: "Addresses common hurdles during and after deployment, such as problems with configuration, build errors, Firebase hosting misconfigurations, and offline behavior. Offers practical tips, tool recommendations, and guidance for reaching support."
+---
+
+# Troubleshooting Deployment & Common Issues
+
+Deploying Aura smoothly and reliably is key to delivering a great experience to your community users. This guide helps you navigate the frequent hurdles encountered during and shortly after deployment, focusing on practical diagnosis, resolution, and prevention. From configuration pitfalls to build errors and offline mode quirks, we empower you to realize a stable, performant Aura deployment.
+
+---
+
+## 1. Common Deployment Issues Overview
+
+During Aura deployment, you may encounter issues that can disrupt your rollout or impact the app's behavior unexpectedly. Understanding these common pain points will help you solve problems faster and avoid repeated errors:
+
+- **Configuration errors:** Missing or incorrect Firebase API keys, misconfigured environment variables, and discrepancies between your Aura Admin and Aura main project data.
+- **Build Failures:** Errors during Vue CLI production build, such as dependency issues or incorrect build targets.
+- **Firebase Hosting Misconfigurations:** Incorrect `firebase.json` settings, improperly set rewrite rules, or permission errors that block deployment or break app routing.
+- **Offline & Service Worker Problems:** Issues with caching, stale content, or unexpected offline behavior post-deployment.
+
+
+## 2. Diagnosing Configuration Problems
+
+### Key Areas to Verify
+
+- **Firebase Project Settings:** Ensure that the Firebase project linked in your Aura app matches the one used by Aura Admin. All necessary Firebase services like Firestore and Hosting must be enabled.
+- **Firebase Configuration Object:** Double-check that the Firebase configuration keys (`apiKey`, `authDomain`, `projectId`, etc.) are correctly set in your environment configuration files as described in the Firebase Integration guide.
+- **Aura Admin Sync:** Since Aura depends on data managed via Aura Admin, verify that collections in Firestore (e.g., `config`, `events`, `team`) are populated and accessible.
+
+<Tip>
+Always test your Firebase config independently - try connecting using Firebase CLI or SDK code snippets to ensure Firebase itself is reachable before troubleshooting the Aura app.
+</Tip>
+
+### Common Symptoms
+
+- App loads with no data (empty screens or "Site not configured" messages).
+- Repeated authorization or permission errors in browser developer console.
+
+<Check>
+If you see a persistent empty UI or error alerts in snackbars related to data fetch failures, verify your Firebase rules and project linkage.
+</Check>
+
+
+## 3. Handling Build Errors
+
+### Vue CLI Build Diagnostics
+
+- Run the build with debug flags (`vue-cli-service build --mode production`) to capture detailed error outputs.
+- Check for missing dependencies or mismatched package versions that could cause build failures.
+- Verify that `vue.config.js` includes the correct PWA and webpack settings per the official Aura setup.
+
+### Best Practices
+
+- Always install dependencies fresh (`npm ci` or `yarn install --frozen-lockfile`) before building.
+- Clear any cached build artifacts.
+
+<Warning>
+Using Node.js versions outside the recommended range can lead to unexpected build errors. Check the System Requirements guide for supported versions.
+</Warning>
+
+
+## 4. Firebase Hosting Deployment Issues
+
+### Common Deployment Pitfalls
+
+- Incorrect or missing `firebase.json` rewrite rules that result in 404 errors for your app routes.
+- Not specifying the correct Firebase project in `.firebaserc` or during CLI deployment.
+- Permission issues preventing the CLI from pushing the new build to Firebase hosting.
+
+### Validation Steps
+
+- Validate your `firebase.json` contains a rewrite to serve `index.html` for SPA routing. Example:
+
+```json
+"rewrites": [
+  { "source": "**", "destination": "/index.html" }
+]
+```
+
+- Run `firebase projects:list` to check your project aliases.
+- Deploy with `firebase deploy --only hosting` and monitor the CLI output for errors.
+
+<Note>
+If the deployment passes but your site shows blank or routing errors, double-check your hosting rewrites and ensure your build outputs are correctly placed in the `public` directory.
+</Note>
+
+
+## 5. Managing Offline Mode and Service Worker Issues
+
+Aura uses a service worker to enable Progressive Web App behaviors like offline access and automatic updates.
+
+### Common Problems
+
+- Application serving stale content after deployment.
+- New updates are not reflected until manual refresh.
+- Service worker registration failures or errors logged in console.
+
+### Solutions and Recommendations
+
+- Listen for the `swUpdated` custom event to prompt users to refresh, as handled in `src/App.vue`.
+- Invalidate or update cache strategies as needed via the Workbox configuration in `vue.config.js` and `src/sw.js`.
+- If you experience persistent caching problems during development, unregister existing service workers via browser dev tools.
+
+<Tip>
+Regularly test your service worker behavior in an incognito window or a fresh profile to eliminate cache-related issues.
+</Tip>
+
+
+## 6. Practical Troubleshooting Workflow
+
+Follow this step-by-step approach to diagnose and resolve issues effectively:
+
+<Steps>
+<Step title="Step 1: Validate Firebase Configuration">
+Verify the Firebase project, environment variables, and data availability as per Section 2.
+</Step>
+<Step title="Step 2: Run Production Build Locally">
+Build your app and serve the output locally using a static server (e.g., `serve dist`) to isolate build issues.
+</Step>
+<Step title="Step 3: Confirm Firebase Hosting Setup">
+Check `firebase.json`, project setup, and ensure correct CLI deployment commands are used.
+</Step>
+<Step title="Step 4: Monitor Service Worker Behavior">
+Check logs for service worker events; simulate offline scenarios to validate caching and refresh flows.
+</Step>
+<Step title="Step 5: Review Browser Console & Network Logs">
+Look for failed requests, permission issues, or CORS errors that hint toward misconfiguration.
+</Step>
+<Step title="Step 6: Consult Logs and Alerts">
+If your Firebase project has Analytics or Cloud functions, review logs for backend errors impacting the frontend.
+</Step>
+<Step title="Step 7: Reach Out for Support">
+If unresolved, collect detailed error messages, reproduction steps, and configuration snapshots.
+Use official channels or GitHub issues for further assistance.
+</Step>
+</Steps>
+
+
+## 7. Tips and Best Practices
+
+- **Keep Aura Admin and Aura synchronized:** Since Aura's data depends on your Aura Admin backend, always validate the Firestore collections after any changes.
+- **Handle environment files carefully:** Never commit your secrets or Firebase API keys publicly.
+- **Test offline mode frequently:** Catch service worker issues early by testing the app in airplane mode.
+- **Use recommended Node.js and Vue CLI versions:** This avoids compatibility problems.
+
+
+## 8. Tool Recommendations
+
+- **Firebase CLI:** For deploying, listing projects, and debugging hosting projects.
+- **Vue Devtools:** For inspecting Vue component state in development.
+- **Browser DevTools:** Especially the Network tab and Application tab (for service worker and cache management).
+- **Static File Servers:** Serve `dist` folder for local testing of production build (e.g., `serve` npm package).
+
+
+## 9. Getting Further Help
+
+If you need additional support:
+
+- Review the [Getting Started Troubleshooting Guide](../getting-started/installation-and-configuration/troubleshooting) for setup and initial run issues.
+- Visit the [Firebase Hosting Deployment](../getting-started/deployment-quickstart/firebase-deployment) page for detailed deployment guidance.
+- Explore the [Service Worker & Offline Mode](../deployment/operations-monitoring-maintenance/service-worker-pwa-updates) document for advanced caching scenarios.
+- Submit issues or feature requests at the project GitHub: [https://github.com/gdg-x/aura](https://github.com/gdg-x/aura).
+
+---
+
+By following this guide, you will confidently overcome common deployment challenges and ensure your Aura application runs reliably, delivering a seamless community experience.
+
+---
