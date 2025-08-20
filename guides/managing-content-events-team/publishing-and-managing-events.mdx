@@ -1,0 +1,213 @@
+---
+title: "Publishing and Managing Events"
+description: "Guide on creating, updating, and promoting events with Aura. Covers custom event pages, public shareable links, and highlights common UX patterns for attendees and organizers, ensuring streamlined event management."
+---
+
+# Publishing and Managing Events with Aura
+
+## Overview
+This guide empowers you to efficiently create, update, and promote events using Aura. You'll learn how to leverage custom event pages, generate public shareable links, and utilize recommended UX patterns designed for both attendees and event organizers. Whether you manage meetups, feature events, or archived past events, this guide ensures you can streamline your event management workflow effectively.
+
+---
+
+## 1. Getting Started with Events in Aura
+
+### What You Will Achieve
+- Publish new events and update existing ones with ease.
+- Display upcoming events dynamically, ensuring visitors always see fresh content.
+- Provide organized directories of past events for reference and discovery.
+- Share events publicly with custom event pages and embedded links.
+
+### Prerequisites
+- Access to the Aura Admin panel with permissions to manage events.
+- Proper Firebase configuration connected to your Aura instance.
+- A Meetup API key configured, if integrating with Meetup events (optional).
+
+### Time Estimate
+- Initial event setup and publishing: 10-20 minutes.
+- Ongoing updates and content promotion: 5-10 minutes per event.
+
+### Difficulty Level
+- Beginner to Intermediate. The UI and workflows are designed for straightforward use without coding.
+
+---
+
+## 2. Publishing Events Workflow
+
+### 2.1 Overview of Event Types
+Aura supports different event sourcing methods:
+- **Meetup Events:** Automatically fetched and displayed using a Meetup group API key.
+- **Custom Events:** Fully controlled through Aura, allowing you to create and manage event details manually.
+- **Feature Events:** Specially highlighted events curated via Firebase that can be showcased prominently.
+
+### 2.2 Creating and Managing Custom Events
+1. **Access the Event Management Section:**
+   - Navigate to the Events page.
+   - Use the 'Create New Event' option or select an existing event to update.
+2. **Fill in Event Details:**
+   - Provide clear names, dates, venues, descriptions, and important links.
+   - Upload relevant images or featured graphics to enhance your event page.
+3. **Set Visibility:**
+   - Toggle visibility status to control if the event appears publicly.
+4. **Save and Publish:**
+   - Submit your event data to Firebase.
+   - Confirm the event page is live under your events directory.
+
+### 2.3 Publishing Meetup Events
+- If you have a Meetup group linked, Aura automatically fetches your upcoming and past Meetup events via the Meetup API.
+- To enable this, ensure your Meetup API key is configured in the system settings.
+- The system will display upcoming Meetup events dynamically on the Events page with details and public links.
+
+### 2.4 Highlighting Featured Events
+- Use the 'Feature Events' feature to spotlight select events.
+- Featured events are fetched from a curated list in Firebase, which you can update to control which events are promoted.
+
+---
+
+## 3. Navigating Event Pages and Content
+
+### 3.1 Upcoming Events Display
+- Aura shows upcoming events prominently with cards displaying key details like event name, date, and description.
+- Loading indicators and error alerts ensure transparency in data retrieval.
+- Example: The `UpcomingEvents` component fetches data and displays each event as a card.
+
+### 3.2 Past Events and Custom Past Events
+- Past events are listed in reverse chronological order.
+- Search functionality lets attendees find events by name or location.
+- Past events data comes either from Meetup or your custom database depending on configuration.
+
+### 3.3 Custom Event Pages
+- Each event has a dedicated page showing detailed information.
+- Features include event schedules, speaker lists, and share buttons.
+- The share feature supports modern browser sharing APIs and graceful fallbacks.
+
+---
+
+## 4. Step-by-Step: Publishing and Promoting an Event
+
+<Steps>
+<Step title="Step 1: Prepare Event Details">
+Gather all relevant information: event title, date/time, venue, description, images, and links.
+</Step>
+<Step title="Step 2: Navigate to Events Management">
+Go to the Events page within Aura’s admin panel and choose to create a new event or edit an existing one.
+</Step>
+<Step title="Step 3: Add or Update Event Data">
+Fill the event form with the prepared information. Ensure all required fields are completed.
+</Step>
+<Step title="Step 4: Set Event Visibility">
+Toggle event visibility to ‘Public’ to ensure the event appears on the public site.
+</Step>
+<Step title="Step 5: Save and Publish">
+Submit your changes. Confirm the event displays correctly in the upcoming events list.
+</Step>
+<Step title="Step 6: Promote Event via Share Link">
+From the event page, use the provided share button. This leverages the browser native sharing API if supported, or allows manual copying of the event URL.
+</Step>
+<Step title="Step 7: Verify Display and Access">
+View the event on the public site. Check all details, links, and embedded content function as expected.
+</Step>
+</Steps>
+
+<Check>
+By following these steps, your event will be visible to attendees with a polished, easy-to-access presentation.
+</Check>
+
+---
+
+## 5. Practical Examples
+
+### Example: Fetching Upcoming Meetup Events
+```javascript
+service.getAllUpcomingMeetupsEvents(meetupApiKey).then(res => {
+  if (res.success && res.data.length > 0) {
+    // Render events on page
+  } else {
+    // Show 'No Upcoming Events' message
+  }
+}).catch(error => {
+  // Display error alert
+});
+```
+
+### Example: Displaying Past Custom Events with Search
+- Use the integrated search field to filter past events by name.
+- Pagination allows viewing events five at a time.
+
+### Practical Tips
+- Always verify the Meetup API key’s validity to avoid fetching errors.
+- Keep event descriptions concise but informative.
+- Use share buttons to maximize event reach.
+
+---
+
+## 6. Troubleshooting & Tips
+
+### Common Issues
+- **Event Not Showing:** Check if the event’s visibility flag is enabled.
+- **Meetup Data Fails to Load:** Confirm API key is correct and the Meetup service is available.
+- **Share Button Not Working:** Some browsers may not support the native share API; copy the URL manually as fallback.
+
+### Best Practices
+- Regularly update featured event lists to keep content fresh.
+- Use clear, community-friendly language in event descriptions.
+- Test event pages on both desktop and mobile devices.
+
+### Performance Considerations
+- Limit the number of events displayed per page to improve load speeds.
+- Optimize images used on event pages to reduce bandwidth.
+
+### Alternative Approaches
+- Use Custom Events if Meetup integration is not desired or is unavailable.
+- Highlight events using Feature Events to draw user attention to important sessions.
+
+---
+
+## 7. Next Steps & Related Content
+
+### Recommended Next Steps
+- Explore [Showcasing Team Members & Speakers](../showcasing-team-and-speakers) to enrich your event experience.
+- Learn how to [Manage and Feature Blogs](../managing-and-featuring-blogs) to complement events with content.
+
+### Related Documentation
+- [Deploying Aura to Firebase](../../getting-started-workflows/deploying-aura-to-firebase) for publishing your site.
+- [Initial Configuration & Theme Setup](../../getting-started-workflows/initial-configuration-and-theme-setup) for brand consistency.
+- [Troubleshooting Common Issues](../../troubleshooting-validation/common-issues) for resolving event data loading problems.
+
+### Resources
+- Firebase backend powering event data storage.
+- Meetup API integration for external event sourcing.
+
+---
+
+## Appendix: Diagram of Event Content Flow
+
+```mermaid
+flowchart TD
+  UI_EventsPage["Events Page UI"] -->|Fetch Upcoming Events| Service_GetUpcoming["Service getAllUpcomingMeetupsEvents API"]
+  UI_EventsPage -->|Fetch Past Events| Service_GetPast["Service getAllMeetupPastEvents API"]
+  UI_CustomEventPage["Custom Event Page UI"] -->|Fetch Event Details| Service_GetEvent["Service getEvent API"]
+  Service_GetUpcoming -->|Success| Display_Upcoming["Display Upcoming Events"]
+  Service_GetUpcoming -->|Failure| Show_Error_Upcoming["Show Error Message"]
+  Service_GetPast -->|Success| Display_Past["Display Past Events"]
+  Service_GetPast -->|Failure| Show_Error_Past["Show Error Message"]
+  Service_GetEvent -->|Success| Display_EventDetails["Render Event Details"]
+  Service_GetEvent -->|Failure| Redirect_EventsList["Redirect to Events List"]
+  Display_Upcoming --> UI_EventsPage
+  Display_Past --> UI_EventsPage
+  Display_EventDetails --> UI_CustomEventPage
+
+  classDef service fill:#d2f4ea,stroke:#0b7a6b,stroke-width:2px, color:#0b7a6b;
+  class Service_GetUpcoming,Service_GetPast,Service_GetEvent service;
+
+  classDef ui fill:#e0e7ff,stroke:#3a4f9f,stroke-width:2px, color:#3a4f9f;
+  class UI_EventsPage,UI_CustomEventPage display_Upcoming,display_Past display_EventDetails ui;
+
+  classDef error fill:#f8d7da,stroke:#721c24,stroke-width:2px,color:#721c24;
+  class Show_Error_Upcoming,Show_Error_Past error;
+
+  classDef action fill:#fff3cd,stroke:#856404,stroke-width:2px, color:#856404;
+  class Redirect_EventsList action;
+```
+
+---

@@ -1,0 +1,158 @@
+---
+title: "System Requirements & Prerequisites"
+description: "Lists required tools (Node.js versions, Vue CLI, Firebase account), supported operating systems, and accessories for a successful setup. Preempts the most common blocking points for new users."
+---
+
+# System Requirements & Prerequisites
+
+Setting up Aura requires ensuring your environment meets specific system requirements and having key tools and accounts ready. This page guides you through the essential prerequisites to avoid common blockers and prepare for a seamless installation and configuration experience.
+
+---
+
+## 1. Supported Operating Systems
+
+Aura is a web application built using modern JavaScript frameworks and works across major operating systems that support Node.js and Vue CLI:
+
+- **Windows:** Windows 10 or later
+- **macOS:** macOS Catalina (10.15) or later
+- **Linux:** Most popular distributions (e.g., Ubuntu 18.04+, Fedora 30+)
+
+> Ensure your OS is updated with the latest security patches for optimal compatibility.
+
+## 2. Required Software & Tools
+
+To develop, run, and deploy Aura, you must have the following software installed:
+
+| Tool             | Recommended Version               | Purpose                                   |
+|------------------|---------------------------------|-------------------------------------------|
+| Node.js          | v16.x LTS (or latest LTS)       | JavaScript runtime for running Aura locally and building the app |
+| npm (Node Package Manager) | Comes with Node.js             | Manage dependencies and run scripts       |
+| Vue CLI          | v4.x or v5.x                    | Vue project scaffolding and local development server |
+| Firebase Account | N/A                             | Manage project hosting, database, and auth |
+
+### Installation Links
+- [Node.js Download](https://nodejs.org/en/download/)
+- [Vue CLI Installation](https://cli.vuejs.org/guide/installation.html)
+- [Firebase Console](https://console.firebase.google.com/)
+
+---
+
+## 3. Minimum Hardware Specifications
+
+While Aura is a web app primarily running in browsers, local development and build processes require adequate resources:
+
+- **Processor:** Dual-core CPU or higher
+- **Memory:** Minimum 4 GB RAM; 8 GB recommended for smooth build
+- **Disk Space:** At least 1 GB free for source code, dependencies, and build cache
+
+> Slow performance during build or `npm install` is often caused by insufficient memory or CPU resources.
+
+---
+
+## 4. Network & Access Requirements
+
+Aura depends on external services and internet connectivity for full functionality:
+
+- **Internet Access:** Required for fetching dependencies, syncing with Firebase, and real-time data loads
+- **Firebase Project:** You must have an active Firebase project with credentials configured for Aura to connect securely
+- **Firewall Settings:** Ensure the following ports are open to allow HTTPS traffic:
+
+  - 443 (HTTPS) for Firebase and external API calls
+  - 80 (HTTP) redirected to HTTPS
+
+> Confirm your network environment allows access to Firebase endpoints to avoid connectivity issues during syncing.
+
+---
+
+## 5. User Accounts & Permissions
+
+Before proceeding with installation and configuration, prepare the following:
+
+- A Google account with Firebase project ownership or editor rights
+- Access to the Firebase Console for your project to generate API keys and configuration
+- Local system permissions to install software and run command-line tools
+
+---
+
+## 6. Common Blocking Points and How to Avoid Them
+
+| Issue                                | How to Prevent / Fix                                  |
+|------------------------------------|-----------------------------------------------------|
+| Using unsupported Node.js version  | Verify Node.js is v16.x LTS or newer before setup    |
+| Missing Firebase configuration keys| Ensure you have project API keys and config files ready |
+| Network restrictions blocking APIs | Check firewall and proxy to allow Firebase URLs       |
+| Insufficient memory causing build failures | Close other heavy applications during build process |
+| No Firebase project created        | Create the Firebase project before configuring Aura   |
+
+<Tip>
+Regularly verify your environment meets these prerequisites before starting installation to avoid unnecessary delays.
+</Tip>
+
+---
+
+## 7. Verification Checklist
+
+Before moving to installation, confirm the following:
+
+- [ ] Node.js (v16.x or latest LTS) and npm installed: run `node -v` and `npm -v` in your terminal.
+- [ ] Vue CLI installed globally: verify with `vue --version`.
+- [ ] Active Firebase project and configuration information available.
+- [ ] Internet connectivity without proxy blocking Firebase.
+- [ ] Adequate hardware specifications for build operations.
+
+<Tip>
+Running these commands will give you quick confirmation:
+
+```bash
+node -v
+npm -v
+vue --version
+```
+
+If any fail, ensure you install or fix that component before proceeding.
+</Tip>
+
+---
+
+## Next Steps
+
+With your environment verified and ready, proceed to the [Cloning and Installing Aura](../install-configure/repo-installation) guide to obtain the source code and begin installation.
+
+You should also review the [Setting up Aura Admin](../setup-prerequisites/aura-admin-note) to ensure your admin panel is ready for integration.
+
+For complete clarity on what Aura does and its user benefits, consider reading the introductory documentation in [What is Aura?](../../overview/product-intro-core-concepts/what-is-aura).
+
+---
+
+## Troubleshooting Tips
+
+If you encounter issues related to prerequisites:
+
+- Reinstall Node.js using the official LTS package.
+- Clear your npm cache with `npm cache clean --force`.
+- Check firewall or VPN settings that might block Firebase connections.
+- Verify Firebase project roles and API key validity.
+
+For persistent problems, consult the [Troubleshooting Common Issues](../../getting-started/troubleshooting-validation/common-issues) documentation.
+
+---
+
+# Summary
+
+This page provides a detailed checklist of system requirements and prerequisites necessary for setting up Aura, including supported operating systems, required software tools, hardware specs, network expectations, and user account needs. It highlights common setup blockers and how to avoid them, ensuring users are fully prepared before installation.
+
+Key sections covered:
+- Supported Operating Systems
+- Required Software & Tool Versions
+- Hardware Requirements
+- Network & Access Needs
+- User Accounts and Permissions
+- Common Setup Blockers
+- Verification Checklist
+- Troubleshooting Guidance
+
+Important links for next steps and related setup documentation:
+- [Cloning and Installing Aura](../install-configure/repo-installation)
+- [Setting up Aura Admin](../setup-prerequisites/aura-admin-note)
+- [What is Aura?](../../overview/product-intro-core-concepts/what-is-aura)
+- [Troubleshooting Common Issues](../../getting-started/troubleshooting-validation/common-issues)

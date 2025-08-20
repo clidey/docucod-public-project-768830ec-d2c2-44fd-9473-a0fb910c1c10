@@ -1,0 +1,183 @@
+---
+title: "Deploying to Firebase Hosting"
+description: "A focused guide to deploying your built Aura application using the Firebase CLI. Learn how to authenticate with Firebase, update hosting configs, and publish to a custom Firebase subdomain or reserved domain, ensuring your site is available to the public."
+---
+
+# Deploying to Firebase Hosting
+
+This guide provides you with a clear, step-by-step workflow to deploy your Aura web application to Firebase Hosting using the Firebase CLI. You will learn how to authenticate with Firebase, configure your hosting settings for your specific Firebase project, and publish your built Aura app to make it publicly accessible.
+
+---
+
+## 1. Prerequisites
+
+Before deploying, ensure the following prerequisites are met:
+
+- Your Aura application has been built for production using the instructions in the **Building for Production** guide.
+- You have a Firebase project set up and linked to your Aura app.
+- Firebase CLI is installed globally on your system.
+
+
+<Tip>
+Install the Firebase CLI if you have not done so already using the command:
+```bash
+npm install -g firebase-tools
+```
+This command installs the Firebase CLI globally, making deployment commands available in your terminal.
+</Tip>
+
+
+## 2. Authenticating with Firebase
+
+To deploy your app, you need authenticated access to your Firebase project.
+
+1. Open your terminal or command prompt.
+2. Navigate to the root directory of your Aura project where the `firebase.json` file resides.
+3. Run:
+
+   ```bash
+   firebase login
+   ```
+
+4. Follow the on-screen instructions to authenticate.
+
+<Tip>
+If you run into access issues, verify that you are logged in to the correct Google account owning the Firebase project.
+</Tip>
+
+## 3. Configuring Firebase Hosting
+
+For Firebase Hosting to know which project and site to deploy, you must update your configuration files.
+
+### 3.1 Update `.firebaserc`
+
+Make sure the `.firebaserc` file contains the correct Firebase Project ID. This ID uniquely identifies your Firebase project.
+
+Example snippet:
+
+```json
+{
+  "projects": {
+    "default": "your-firebase-project-id"
+  }
+}
+```
+
+### 3.2 Update `firebase.json`
+
+Configure your hosting site and deployment behavior in the `firebase.json` file. For Aura, your config will look like this:
+
+```json
+{
+  "hosting": {
+    "site": "Your_Firebase_Hosting_id",
+    "public": "dist",
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+Replace `Your_Firebase_Hosting_id` with your actual Firebase Hosting Site ID. This is typically your project ID or the custom ID you set in Firebase Hosting.
+
+<Tip>
+Verify your Site ID by checking the Firebase Console under Hosting. It will be visible in the Hosting dashboard URL or site settings.
+</Tip>
+
+## 4. Build Your Production-Ready Aura App
+
+Before deploying, ensure Aura is built for production to generate optimized, minified files.
+
+Run:
+
+```bash
+npm run build
+```
+
+This generates the `/dist` directory containing your production-ready static web files.
+
+<Check>
+Verify that the `dist` folder was created successfully and contains files like `index.html`, `service-worker.js`, and the JS/CSS asset bundles.
+</Check>
+
+## 5. Deploy to Firebase Hosting
+
+With authentication, configuration, and build steps completed, you are ready to deploy.
+
+Run the deploy command:
+
+```bash
+firebase deploy
+```
+
+This command uploads the contents of your `dist` folder to Firebase Hosting, making your Aura web app accessible via your Firebase Hosting URL.
+
+
+## 6. Post-Deployment Verification
+
+After deployment completes successfully:
+
+- Visit your Firebase Hosting URL, usually in the form:
+  
+  ```
+  https://your-firebase-project-id.web.app
+  ```
+  
+- Verify that your Aura application loads successfully without errors.
+- Test offline support and PWA functionality by disconnecting from the internet and refreshing the page (Aura supports offline mode).
+
+<Tip>
+If you see a message like "Your internet is not working or Site is not Configured," refer to the Troubleshooting section.
+</Tip>
+
+---
+
+## Troubleshooting Common Deployment Issues
+
+<AccordionGroup title="Deployment Troubleshooting Tips">
+<Accordion title="Firebase Login Issues">
+- Ensure you run `firebase login` in your terminal.
+- Confirm you are logged in to the Google account that owns the Firebase project.
+- Run `firebase logout` and `firebase login` again to reset authentication.
+</Accordion>
+
+<Accordion title="Incorrect Project or Site ID">
+- Double-check `.firebaserc` and `firebase.json` for correct project and site IDs.
+- These must exactly match your Firebase Console project and site names.
+</Accordion>
+
+<Accordion title="Build Artifacts Missing or Incorrect">
+- Confirm `npm run build` completes without errors.
+- Ensure the `dist` directory exists and contains your compiled app.
+- Re-run the build and deploy after verifying the build output.
+</Accordion>
+
+<Accordion title="Service Worker Not Registering or Caching Issues">
+- Clear your browser cache and unregister any existing service workers.
+- Review `src/registerServiceWorker.js` logs in your browser console.
+- Verify the `vue.config.js` PWA section to ensure proper service worker settings.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Summary
+
+By following this guide, you connect your built Aura app to Firebase Hosting, authenticate securely, configure the deployment parameters correctly, and publish your community website live, fully optimized for speed, offline use, and scalability.
+
+---
+
+## Related Documentation
+
+- [Building for Production](https://docs.example.com/deployment/deployment-essentials/production-build)  
+- [Environment Configuration](https://docs.example.com/deployment/deployment-essentials/environment-configuration)  
+- [Troubleshooting Common Issues](https://docs.example.com/getting-started/troubleshooting-validation/common-issues)  
+
+For more advanced deployment strategies and optimizations, refer to other deployment guides in this documentation.

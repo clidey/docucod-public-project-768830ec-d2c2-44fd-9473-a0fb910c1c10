@@ -1,0 +1,221 @@
+---
+title: "Environment Configuration"
+description: "How to prepare and configure your local and deployment environments for Aura. Learn how to set up your Firebase config, update environment variables, and ensure your settings match Firebase project requirements for a smooth deployment."
+---
+
+# Environment Configuration for Aura
+
+Preparing and configuring your local development and deployment environments correctly is essential for a stable, secure, and smooth-running Aura application. This guide will walk you through the key configuration steps and environment setups necessary before running or deploying Aura, with a particular focus on Firebase integration and environment variable preparation.
+
+---
+
+## 1. Overview
+
+Aura leverages Firebase as the backend and hosting platform, requiring you to correctly configure Firebase project details, environment variables, and local settings. Proper environment configuration ensures that Aura can connect to Firebase services, load your community data, and function optimally both during local development and in production.
+
+---
+
+## 2. Firebase Project Configuration
+
+### Step 1: Prepare Your Firebase Project
+
+- **Create or Use an Existing Firebase Project:** Ensure that the Firebase project you choose is dedicated to your Aura deployment.
+- **Enable Required Services:** At minimum, enable Firebase Hosting, Firestore, and any Authentication services your instance of Aura requires.
+- **Obtain Firebase Config Credentials:** You will need the Firebase Web API keys and project identifiers (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId).
+
+### Step 2: Update Firebase Configuration Files
+
+The Firebase configuration must be correctly referenced within Aura to establish connectivity. Locate and update the Firebase config file found typically under `src/config/firebase.js` (or your designated config path). Replace placeholder values with credentials from your Firebase console.
+
+Example structure of Firebase config:
+
+```javascript
+export default {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "your-messaging-sender-id",
+  appId: "your-app-id"
+};
+```
+
+<Tip>
+If you maintain multiple Firebase environments (development, staging, production), consider organizing separate config files or environment variables for each to avoid accidental cross-environment operations.
+</Tip>
+
+---
+
+## 3. Environment Variables Setup
+
+To keep sensitive keys and environment-specific settings secure and manageable, utilize environment variables in your local and production setups.
+
+### Step 1: Create `.env` Files
+
+- For local development, create a `.env.local` file in your project root.
+- For production, environment variables should be configured via your deployment platform or build process.
+
+### Step 2: Define Key Variables
+
+Include variables such as:
+
+```bash
+VUE_APP_FIREBASE_API_KEY=your-api-key
+VUE_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VUE_APP_FIREBASE_PROJECT_ID=your-project-id
+VUE_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VUE_APP_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+VUE_APP_FIREBASE_APP_ID=your-app-id
+```
+
+Aura’s build and runtime processes read these variables to inject proper Firebase connection details.
+
+<Tip>
+Verify the `.env` files are added to `.gitignore` to avoid committing sensitive data.
+</Tip>
+
+---
+
+## 4. Configuring `vue.config.js` for PWA & Build Options
+
+Aura uses Vue CLI with specific configurations to support production builds and PWA capabilities:
+
+- **Service Worker Setup:** Managed via the `pwa` configuration block.
+- **Transpiling Dependencies:** Ensures library compatibility, notably for Vuetify.
+- **Source Maps:** Disabled in production for security and smaller build size.
+
+Example snippet:
+
+```javascript
+module.exports = {
+  chainWebpack: config => {
+    config.plugins.delete('prefetch');
+  },
+  transpileDependencies: ["vuetify"],
+  productionSourceMap: false,
+  pwa: {
+    name: 'Aura Main',
+    workboxPluginMode: 'InjectManifest',
+    themeColor: '#4A90E2',
+    msTileColor: '#4A90E2',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    manifestOptions: {
+      background_color: "#ffffff"
+    },
+    workboxOptions: {
+      swSrc: './src/sw.js',
+      swDest: 'service-worker.js',
+    },
+  }
+}
+```
+
+Review and adapt this file if you have custom branding or service worker requirements.
+
+---
+
+## 5. Local Development Environment Preparation
+
+### Step 1: Install Dependencies
+
+Ensure Node.js (compatible version) and npm/yarn are installed.
+
+Install project dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### Step 2: Verify Firebase Config
+
+Confirm your Firebase config is accessible and valid. Aura’s main app file and services rely on these credentials to fetch settings.
+
+### Step 3: Running Locally
+
+Run the development server:
+
+```bash
+npm run serve
+# or
+vue-cli-service serve
+```
+
+You should see Aura load with initial configurations. If any configuration keys are missing, the app will show notices or the no data message.
+
+<Tip>
+If you encounter "no data" or configuration errors, verify:
+- Firebase configs are correct
+- Network connectivity to Firebase
+- Environment variables are properly loaded
+</Tip>
+
+---
+
+## 6. Preparing for Deployment
+
+### Step 1: Align Environment Variables
+
+For production, securely inject your Firebase config using environment variables or deployment platform-specific variables.
+
+### Step 2: Confirm `vue.config.js` Settings
+
+Ensure productionSourceMap is disabled for smaller builds and security.
+
+Validate the PWA settings, particularly the service worker source and destination.
+
+### Step 3: Test Build Locally
+
+Generate a production build to detect potential environment-related errors:
+
+```bash
+npm run build
+```
+
+Inspect the `dist/` folder for output.
+
+---
+
+## 7. Common Pitfalls and Best Practices
+
+- **Keep Firebase API keys Confidential:** Though not highly sensitive, avoid exposing them publicly.
+- **Sync Firebase Project Across Aura Main and Aura Admin:** Both frontends require matching Firebase configs.
+- **Validate All Required Configs Are Loaded:** Missing generalConfig, keysandsecurity, or footerConfig leads to app failure.
+- **Use Environment Variables for Secrets:** Never hardcode secrets in source files.
+- **Check Service Worker Registration:** For PWA offline support to work, service worker configuration must be accurate.
+
+---
+
+## 8. Troubleshooting
+
+<AccordionGroup title="Troubleshooting Firebase Configuration Issues">
+<Accordion title="App Shows 'No Data' or Configuration Missing">
+Verify if your Firebase project is correctly initialized and your config values are accurate.
+Check your network connection and Firestore rules.
+</Accordion>
+<Accordion title="Service Worker Not Registering">
+Confirm that `vue.config.js`'s `pwa.workboxOptions.swSrc` path is correct.
+Make sure the service worker file exists and is included in the build.
+</Accordion>
+<Accordion title="Environment Variables Not Loading">
+Ensure `.env` files are in the root of the project and variable naming matches `VUE_APP_*` convention.
+Restart your development server after making changes.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 9. Additional Resources
+
+- [Firebase Setup Guide](/getting-started/configuration-run/firebase-setup) for detailed Firebase initialization.
+- [Running Aura Locally](/getting-started/configuration-run/local-run) for local development tips.
+- [Deploying Aura to Firebase](/guides/getting-started-workflows/deploying-aura-to-firebase) for end-to-end deployment instructions.
+- [Troubleshooting Common Issues](/getting-started/troubleshooting-validation/common-issues) to proactively resolve setup errors.
+
+---
+
+By carefully setting up your environment configuration as outlined, you ensure Aura runs reliably both in local development and when deployed to production, unlocking its full community engagement capabilities safely and effectively.
+
+
