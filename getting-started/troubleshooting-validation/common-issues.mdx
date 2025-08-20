@@ -1,0 +1,281 @@
+---
+title: "Troubleshooting Common Issues"
+description: "Surfaces the most likely errors during setup—such as misconfigured Firebase credentials, npm version mismatches, or failed CLI commands—and provides actionable remedies. Also shows users how to get additional support."
+---
+
+# Troubleshooting Common Issues
+
+This page helps you quickly identify and resolve some of the most frequent problems encountered during Aura setup and usage. Whether it's Firebase credential misconfiguration, npm version incompatibilities, or CLI command failures, this guide provides actionable steps to remedy these issues and get your environment running smoothly.
+
+---
+
+## 1. Diagnosing Setup Errors
+
+To successfully run Aura, several components need to be correctly set up, including Firebase configuration, npm dependencies, and the Aura CLI. Problems during these initial steps can cause failure in running the app locally or deploying it.
+
+This section helps you identify the most likely causes behind common setbacks and guides you through resolving them.
+
+### Common Setup Error Categories
+- **Firebase Credentials Misconfiguration**
+- **npm Version Mismatch or Dependency Conflicts**
+- **Failed CLI Commands or Build Steps**
+
+
+---
+
+## 2. Troubleshooting Firebase Credentials Issues
+
+Aura requires Firebase credentials to be correctly set up for authentication, database access, and hosting.
+
+### Symptoms
+- Errors related to Firebase during development or deployment
+- Authentication failures
+- Firestore collection access errors
+- App content not loading correctly
+
+### Actionable Remedies
+1. **Verify Firebase Project**
+   - Confirm that you are using the *same* Firebase project for both the Aura Main and Aura Admin repositories.
+   - Check your Firebase project ID matches in the configuration files.
+   
+2. **Check Firebase Configuration File**
+   - Confirm your `firebaseConfig` object in the project points to the right API keys, Auth domain, Database URL, and other credentials.
+   - Ensure the config file is updated after cloning or forking the repo.
+
+3. **Inspect Firestore Rules and Collections**
+   - Make sure Firestore rules allow read/write access as expected during development.
+   - Review collections such as `team`, `events`, `Speakers`, and `config` exist and contain the necessary data.
+
+4. **Reauthenticate Firebase CLI**
+   Run:
+   ```bash
+   firebase logout
+   firebase login
+   ```
+   to refresh CLI credentials.
+
+5. **Test Firestore Access Manually**
+   - Use Firebase console to verify you can read/write to collections.
+
+<Tip>
+Firebase misconfiguration is the most frequent source of errors. Always double-check your Firebase credentials and project association first before proceeding to complex fixes.
+</Tip>
+
+---
+
+## 3. Resolving npm and Dependency Issues
+
+Aura depends on specific npm versions and packages to function correctly. Misalignment between project dependencies and your environment can cause build errors or failed npm install.
+
+### Symptoms
+- `npm install` fails with errors
+- Build compilation errors
+- Unexpected runtime errors due to missing or incompatible packages
+
+### Recommended Steps
+
+1. **Check Your Node.js and npm Versions**
+
+Run:
+
+```bash
+node -v
+npm -v
+```
+
+Compare with Aura’s required versions listed in the `package.json` or project documentation. Upgrade or downgrade accordingly.
+
+2. **Clean npm Cache and Reinstall Dependencies**
+
+```bash
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+3. **Update npm to Latest Stable Version**
+
+```bash
+npm install -g npm@latest
+```
+
+4. **Use `npm ci` for Consistent Install (if using lockfile)**
+
+If a `package-lock.json` is present, prefer:
+
+```bash
+npm ci
+```
+
+5. **Check for Peer Dependency Warnings and Fix**
+
+Review warnings during npm install and address peer dependency conflicts by adjusting package versions or running npm audit/fix.
+
+<Tip>
+Use Node Version Manager ([nvm](https://github.com/nvm-sh/nvm)) to easily switch Node.js versions without system-wide impact.
+</Tip>
+
+---
+
+## 4. Handling Failed CLI Commands and Build Errors
+
+CLI commands for running, building, or deploying Aura might fail due to misconfiguration or missing steps.
+
+### Common Failures
+- `npm run serve` or `npm run dev` fails to start the local dev server
+- `npm run build` throws errors or incomplete builds
+- Firebase CLI deployment commands fail
+
+### Step-by-Step Remedies
+
+1. **Validate Environment Variables and Firebase Setup**
+
+- Confirm `.env` or config files are properly set.
+- Refer to the Firebase setup and environment configuration documentation for precise values.
+
+2. **Run Development Server**
+
+Try:
+
+```bash
+npm run serve
+```
+
+Look for errors that can signal missing packages or config issues.
+
+3. **Build for Production**
+
+Run:
+
+```bash
+npm run build
+```
+
+Check for errors and warnings; fix any reported missing modules or permissions.
+
+4. **Firebase Deploy**
+
+Use:
+
+```bash
+firebase deploy
+```
+
+Make sure you are logged into Firebase CLI:
+
+```bash
+firebase login
+```
+
+and that your project alias is correctly set:
+
+```bash
+firebase use <your_project_id>
+```
+
+5. **Review Logs for Clues**
+
+CLI output usually states the cause clearly; hone in on the specific error messages for troubleshooting.
+
+---
+
+## 5. Additional Support and Resources
+
+If issues persist after following the steps above, you have several options:
+
+- **Official Support Channels:** Check Aura’s GitHub issues at [https://github.com/gdg-x/aura/issues](https://github.com/gdg-x/aura/issues)
+
+- **Community Forums:** Join community chats or forums where Aura developers discuss problems
+
+- **Related Documentation:** 
+  - [Troubleshooting Deployment](https://docs.example.com/deployment/operations-monitoring-maintenance/troubleshooting-deployment) for deployment-specific errors
+  - [Getting Started Guides](https://docs.example.com/getting-started/installation/getting-the-code) for setup details
+
+- **Open an Issue:** Provide detailed diagnosis steps, error logs, and system info to help maintainers assist you promptly.
+
+---
+
+## 6. Summary Checklist for Troubleshooting
+
+<Steps>
+<Step title="Verify Firebase Credentials">
+Confirm Firebase project and credential configuration is accurate.
+</Step>
+<Step title="Check npm and Node.js versions">
+Ensure your environment matches required versions.
+</Step>
+<Step title="Clean and reinstall dependencies">
+Run fresh installation of npm packages.
+</Step>
+<Step title="Run local server and build">
+Execute `npm run serve` and `npm run build` and note any errors.
+</Step>
+<Step title="Validate Firebase CLI login and deployment">
+Authenticate Firebase CLI and verify project alias.
+</Step>
+<Step title="Seek Support if Needed">
+Use GitHub issues or community resources for further help.
+</Step>
+</Steps>
+
+---
+
+## Troubleshooting Scenarios & Tips
+
+<AccordionGroup title="Common Issues and Fixes">
+<Accordion title="Firebase Errors: Firestore Access Denied">
+This usually means your Firestore security rules or Firebase project setup is incorrect.
+
+**Solution:**
+- Adjust Firestore rules temporarily during development to allow reads.
+- Confirm you’re pointing to the right Firebase project.
+</Accordion>
+
+<Accordion title="npm install fails with version conflicts">
+Dependency conflicts often come from mismatched version requirements.
+
+**Solution:**
+- Clean npm cache.
+- Delete `node_modules` and lockfile.
+- Use `npm ci` if applicable.
+- Use `nvm` to switch Node.js versions.
+</Accordion>
+
+<Accordion title="Build Fails with Missing Module Errors">
+Sometimes build fails due to missing optional dependencies.
+
+**Solution:**
+- Reinstall dependencies.
+- Check package.json for missing or deprecated packages.
+- Confirm you have internet connectivity to download packages.
+</Accordion>
+
+<Accordion title="Firebase CLI Deployment Errors">
+Cannot deploy due to permissions or project alias errors.
+
+**Solution:**
+- Run `firebase login` again to authenticate.
+- Use `firebase use <project_id>` to set active project.
+- Verify roles in Firebase Console for your account.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Related Documentation
+
+- [Getting the Code](https://docs.example.com/getting-started/installation/getting-the-code) - How to clone and configure Aura repositories
+- [Running Aura Locally](https://docs.example.com/getting-started/configuration-run/local-run) - Starting the app for local development
+- [Production Build & Deployment](https://docs.example.com/getting-started/configuration-run/production-build) - Building and deploying Aura
+- [Troubleshooting Deployment](https://docs.example.com/deployment/operations-monitoring-maintenance/troubleshooting-deployment) - For deployment-specific diagnostics
+
+---
+
+## Final Notes
+
+Troubleshooting is a critical step in ensuring your Aura setup flows flawlessly. Approach each error as an opportunity to deepen your understanding of how the app integrates with Firebase, npm, and Firebase CLI. With systematic checks and the remedies here, you will resolve most common issues with confidence.
+
+Remember, clean configurations, matching versions, and precise credentials are your most powerful troubleshooting allies.
+
+
+---
