@@ -1,0 +1,186 @@
+---
+title: "Connecting Aura Admin for Community Management"
+description: "Integrate Aura Main with Aura Admin to unlock effortless team, event, and content management for your tech community. This guide details how to set up both repos, use a shared Firebase backend, and verify bidirectional data flow."
+---
+
+# Connecting Aura Admin for Community Management
+
+Integrate Aura Main with Aura Admin to unlock effortless team, event, and content management for your tech community. This guide walks you through setting up both Aura Main and Aura Admin repositories, configuring a shared Firebase backend, and verifying successful bidirectional data flow.
+
+---
+
+## Workflow Overview
+
+### What You Will Achieve
+By following this guide, you'll set up and connect the Aura Main public web application with the Aura Admin management console using a single shared Firebase project. This connection enables seamless management and live synchronization of community teams, events, speakers, and other content.
+
+### Prerequisites
+- You have forked and cloned both the `Aura Main` and `Aura Admin` repositories locally.
+- A Firebase project is created in the Firebase Console.
+- Node.js (version 8.9.4 to 12.13.0) and Vue CLI installed globally.
+- Both repositories configured to use the *same* Firebase project and Firebase credentials.
+- Basic familiarity with using terminal commands and editing config files.
+
+### Expected Outcome
+- Aura Main and Aura Admin share a unified Firebase backend.
+- Changes made in Aura Admin reflect immediately on Aura Main for event, team, speaker, and content updates.
+- Both apps run locally or deployed with synchronized data.
+
+### Time Estimate
+Approximately 30-45 minutes depending on familiarity with Firebase and local environment setup.
+
+### Difficulty Level
+Intermediate – assumes basic development environment proficiency and Firebase usage.
+
+---
+
+## Step-by-Step Instructions
+
+<Steps>
+<Step title="Fork and Clone Both Repositories">
+1. Fork both [Aura Main](https://github.com/gdg-x/aura) and [Aura Admin](https://github.com/gdg-x/aura-admin) repositories on GitHub to your account.
+2. Clone your forks locally using:
+```bash
+   git clone https://github.com/YOUR_USERNAME/aura.git
+   git clone https://github.com/YOUR_USERNAME/aura-admin.git
+```
+3. Navigate inside both directories separately for further setup.
+</Step>
+
+<Step title="Create or Use a Single Firebase Project">
+1. In the [Firebase Console](https://console.firebase.google.com), create a new project or select an existing one.
+2. Configure authentication, Firestore database, and storage as you plan for your community.
+3. From the Project Overview, create a new web app. Copy the Firebase config keys displayed.
+</Step>
+
+<Step title="Configure Firebase in Aura Main">
+1. Open `src/config/firebase.js` inside the Aura Main repo.
+2. Replace the placeholder values with your Firebase Web App config keys:
+```js
+const firebaseConfig = {
+  apiKey: '<YOUR_API_KEY>',
+  authDomain: '<YOUR_AUTH_DOMAIN>',
+  databaseURL: '<YOUR_DATABASE_URL>',
+  projectId: '<YOUR_PROJECT_ID>',
+  storageBucket: '<YOUR_STORAGE_BUCKET>',
+  messagingSenderId: '<YOUR_MESSAGING_SENDER_ID>',
+  appId: '<YOUR_APP_ID>'
+};
+```
+3. Save and close the file.
+</Step>
+
+<Step title="Configure Firebase in Aura Admin">
+1. Navigate to the `src/config/firebase.js` or equivalent config file in Aura Admin.
+2. Use the **same** Firebase config keys as set for Aura Main.
+3. Ensure Firestore rules and security allow Admin app access per your project's security settings.
+</Step>
+
+<Step title="Install Dependencies and Run Locally">
+1. For **each** repo, install dependencies:
+```bash
+npm install
+```
+2. Run the dev server for Aura Admin:
+```bash
+npm run serve
+```
+3. Run the dev server for Aura Main in its folder:
+```bash
+npm run serve
+```
+4. Both apps should now connect to the same Firebase backend.
+</Step>
+
+<Step title="Verify Data Synchronization">
+1. Open Aura Admin in your browser, log in, and add or update teams, events, or speakers.
+2. Open Aura Main in a separate tab or device.
+3. Confirm changes made in Aura Admin reflect live on Aura Main UI without extra refresh.
+4. This confirms correct bidirectional data flow and shared backend.
+</Step>
+
+<Step title="Production Deployment Setup">
+1. Update `firebase.json` in Aura Main, setting the `site` property:
+```json
+{
+  "hosting": {
+    "site": "<YOUR_FIREBASE_SITE_ID>",
+    "public": "dist",
+    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+  }
+}
+```
+2. Build Aura Main for production:
+```bash
+npm run build
+```
+3. Deploy using Firebase CLI:
+```bash
+firebase deploy
+```
+4. Repeat similar deployment steps for Aura Admin if deploying it as well.
+</Step>
+</Steps>
+
+---
+
+## Practical Example
+
+### Sample Firebase Config Snippet in Aura Main
+```js
+const firebaseConfig = {
+  apiKey: "AIzaSyXXXXX...",
+  authDomain: "myaurapp.firebaseapp.com",
+  databaseURL: "https://myaurapp.firebaseio.com",
+  projectId: "myaurapp",
+  storageBucket: "myaurapp.appspot.com",
+  messagingSenderId: "419511997060",
+  appId: "1:419511997060:web:ce7aa0d308f6b484f868d1"
+};
+```
+
+### Directory Sync Example
+- Add a new event or speaker in Aura Admin admin interface.
+- Confirm immediate appearance on Aura Main events or speakers pages.
+
+---
+
+## Troubleshooting & Tips
+
+<AccordionGroup title="Common Issues">
+<Accordion title="App Not Showing Updated Data">
+Ensure both Aura Main and Aura Admin are connected to the *same* Firebase project with identical config settings. Mismatched projects lead to stale or missing data.
+</Accordion>
+<Accordion title="Firebase Config Validation">
+Verify your Firebase config keys exactly match those in Firebase Console > Project Settings > General > Your Apps > Firebase SDK snippet. Copy-paste to avoid typos.
+</Accordion>
+<Accordion title="Authentication Issues in Aura Admin">
+Check Firebase Authentication rules and user accounts. Aura Admin requires appropriate permissions to create and modify Firestore documents.
+</Accordion>
+<Accordion title="Firestore Persistence Errors">
+Firestore offline persistence may log warnings but generally does not block usage. Check browser support and clear cache if necessary.
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Running both Aura Main and Aura Admin locally simultaneously helps instantly verify your setup and diagnose syncing issues before deployment.
+</Tip>
+
+<Tip>
+Use the Firebase Console Firestore viewer to monitor live data changes and verify updates made from either app propagate correctly.
+</Tip>
+
+---
+
+## Next Steps & Related Content
+
+- [Setting up Aura Admin](https://github.com/gdg-x/aura-admin) - Essential for managing community data.
+- [Installing and Getting Started with Aura Main](../install-and-setup) - Initial setup guide for Aura Main.
+- [Deploying Your Community App on Firebase](../deploying-on-firebase) - Guide on publishing your Aura apps.
+- [Configuring Firebase Integration](../../install-configure/firebase-setup) - Details for advanced Firebase configuration.
+- [Managing Events, Teams, and Speakers](../../community-features/managing-events) - Utilize full power of synchronized data.
+
+Step confidently forward to empower your tech community with synchronized management and live-public web presence using Aura.
+
+---
