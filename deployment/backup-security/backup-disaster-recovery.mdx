@@ -1,0 +1,228 @@
+---
+title: "Backup & Disaster Recovery"
+description: "Guides users through backing up key configurations (`firebase.json`, `.firebaserc`, `src/config/firebase.js`), coordinating with Aura Admin backups, and restoring deployments after accidental data loss or migration."
+---
+
+# Backup & Disaster Recovery
+
+Protecting your Aura deployment and its critical configuration is essential to maintain community engagement and avoid data loss. This guide equips you with clear procedures to back up key configuration files, coordinate with Aura Admin backups, and restore your Firebase deployment efficiently after accidental deletion, data corruption, or during migration.
+
+---
+
+## 1. Overview of Key Backup Components
+
+Aura’s production deployment depends heavily on Firebase infrastructure and project-specific configuration assets. Knowing what to back up is your first line of defense.
+
+- **Firebase Configuration Files:**
+  - `firebase.json`: Defines Firebase Hosting settings, including site ID, public directory, and rewrite rules.
+  - `.firebaserc`: Specifies the Firebase project association for your CLI deployments.
+  - `src/config/firebase.js`: Contains your Firebase project credentials and initialization code used by the app.
+
+- **Firebase Backend Data:** Firestore collections (e.g., `events`, `team`, `partners`) and Firebase Storage contents holding your community data.
+
+- **Aura Admin Backups:** Your companion Aura Admin app manages much of this data; ensure backups there are scheduled and verified to complement your Aura Main app data.
+
+
+<Tip>
+Make regular backups of these configuration files and sync with your version control repository. Treat these files as part of your production artifacts.
+</Tip>
+
+## 2. Backing Up Configuration Files
+
+These configuration files form the backbone of your Firebase deployment setup.
+
+### 2.1 Backing Up `firebase.json`
+
+- This file is located in your project root.
+- It controls Firebase Hosting behavior such as which directory to serve (`dist`) and rewrite rules.
+
+**Action:**
+- Commit it into your Git repository.
+- Maintain a copy externally (e.g., secured cloud storage).
+
+### 2.2 Backing Up `.firebaserc`
+
+- This file holds your Firebase project references.
+- Essential to ensure deployment targets the correct Firebase project.
+
+**Action:**
+- Keep it versioned alongside your source code.
+- Periodically verify project IDs match your Firebase Console environment.
+
+### 2.3 Backing Up `src/config/firebase.js`
+
+- Contains your Firebase SDK initialization with API keys and project details.
+- Crucial for app connectivity to Firebase services (Auth, Firestore, Storage).
+
+**Action:**
+- Avoid exposing this file publicly.
+- Store securely with restricted access.
+- Ensure the values are synchronized if you migrate to another Firebase project.
+
+<Tip>
+Use environment-specific configuration or secrets management to safeguard these sensitive credentials.
+</Tip>
+
+## 3. Scheduling Automated Firestore Backups
+
+While configuration files are version-controlled, your Firestore data requires a different approach.
+
+- Firebase does not provide native automatic daily backups for Firestore in the free tier.
+- Use Google Cloud's Firestore export tools or scheduled Cloud Functions to export data to Google Cloud Storage.
+
+**Recommended Actions:**
+- Set up scheduled exports using Google Cloud Scheduler targeting Firestore.
+- Store export files in a dedicated Google Cloud Storage bucket with lifecycle policies.
+- Test restoration from these exports on a separate test project.
+
+See https://firebase.google.com/docs/firestore/manage-data/export-import for detailed instructions.
+
+## 4. Backing Up Firebase Storage
+
+Firebase Storage stores files such as user-uploaded images or assets.
+
+- Regularly export or copy these files to a backup location.
+- Use gsutil commands or automated scripts for regular syncing.
+
+Ensure storage rules are up to date before restoring files to avoid unauthorized access.
+
+## 5. Coordinating with Aura Admin Backups
+
+The Aura solution includes a companion Admin app managing much of the community content.
+
+- Verify backups and disaster recovery procedures also include Aura Admin’s Firestore data.
+- Synchronize restoration steps for both Aura Main and Aura Admin.
+- Maintain consistency in Firebase project configurations across both codebases.
+
+<Tip>
+Coordinate your backup schedules to minimize data drift and enable faster recovery.
+</Tip>
+
+## 6. Restoration Workflow After Data Loss or Migration
+
+In the event of accidental deletion, corruption, or migration, follow these steps to restore your Aura deployment:
+
+### Step 1: Restore Configuration Files
+
+- Retrieve `firebase.json`, `.firebaserc`, and `src/config/firebase.js` from backups or version control.
+- Verify Firebase project IDs and hosting configuration.
+- If moving to a new Firebase project, update these files accordingly.
+
+### Step 2: Redeploy the App to Firebase Hosting
+
+1. In your project directory, run a production build:
+
+```bash
+npm run build
+```
+
+2. Deploy to Firebase Hosting with:
+
+```bash
+firebase deploy --only hosting
+```
+
+3. Confirm deployment success via Firebase Console.
+
+### Step 3: Restore Firestore Data
+
+- Use your Firestore exports to import data back to the Firestore via `gcloud` CLI or Firebase Console tools.
+
+### Step 4: Restore Firebase Storage Files
+
+- Sync backed-up storage assets back to Firebase Storage using gsutil or Firebase CLI.
+
+### Step 5: Validate the Deployment
+
+- Launch the Aura web app.
+- Verify data presence, UI functionality, and integration with Aura Admin.
+- Test offline mode and key features.
+
+<Tip>
+Always perform restoration in a staging or test environment first before production recovery.
+</Tip>
+
+## 7. Common Pitfalls and Troubleshooting
+
+- **Mismatched Firebase project IDs:** Check `.firebaserc` and `firebase.js` to ensure consistency.
+- **Build folder not updated:** Always run a fresh production build before deploying.
+- **Firestore or Storage restoration incomplete:** Verify export completeness and permissions.
+- **Configuration file exposure:** Avoid committing sensitive API keys in public repositories.
+
+## 8. Additional Best Practices
+
+- Use Git branches or tags to version your deployment configurations.
+- Document your backup and restore steps internally.
+- Automate backup scheduling with notifications for failures.
+- Regularly test restoration procedures to confirm readiness.
+
+---
+
+By systematically backing up your configuration files and Firebase data, and coordinating with Aura Admin backups, you empower your community app for resilient operation. Quick restoration ensures your audience remains engaged without disruption, securing your community’s digital presence.
+
+
+---
+
+## Appendix: Reference Configuration Files
+
+### Example snippet from `firebase.json`
+```json
+{
+  "hosting": {
+    "site": "myaurapp",
+    "public": "dist",
+    "rewrites": [ {
+      "source": "**",
+      "destination": "/index.html"
+    } ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+### Example snippet from `.firebaserc`
+```json
+{
+  "projects": {
+    "default": "myaurapp"
+  }
+}
+```
+
+### Example snippet from `src/config/firebase.js`
+```javascript
+import firebase from 'firebase/app';
+import 'firebase/auth';   
+import 'firebase/storage';
+import 'firebase/firestore';
+import 'firebase/messaging';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCOl0qzkhCDmyWeeIT8AZe4xyJJlIfU5gE",
+  authDomain: "myaurapp.firebaseapp.com",
+  databaseURL: "https://myaurapp.firebaseio.com",
+  projectId: "myaurapp",
+  storageBucket: "myaurapp.appspot.com",
+  messagingSenderId: "419511997060",
+  appId: "1:419511997060:web:ce7aa0d308f6b484f868d1"
+};
+
+firebase.initializeApp(firebaseConfig);
+firebase.firestore().enablePersistence({synchronizeTabs:!0}).catch(() => {
+  console.warn("DB offline support not available")
+})
+
+export default {
+  notificationSupported: firebase.messaging.isSupported(),
+  messaging: (firebase.messaging.isSupported()) ? firebase.messaging() : null,
+  firestore: firebase.firestore(),
+  auth: firebase.auth(),
+  storage: firebase.storage(),
+};
+```
+
+---
