@@ -1,0 +1,215 @@
+---
+title: "Project & Environment Configuration"
+description: "Guides users in tailoring project-specific settings, including updating vue.config.js and matching configuration across both Aura and Aura Admin installations. Addresses essential variables and options."
+---
+
+# Project & Environment Configuration
+
+This guide helps you customize key project settings for Aura to ensure smooth integration and consistent configuration between the Aura Main app and Aura Admin. You will learn how to update environment-specific files like `vue.config.js`, ensure synchronized Firebase project references, and adjust essential variables to tailor the application for your context.
+
+---
+
+## 1. Overview
+
+Aura requires coordinated configuration between the main web app (Aura Main) and the admin panel (Aura Admin). This page focuses on how to configure your local and production environments, update build-time settings, and maintain matching Firebase project details across both repositories.
+
+Achieving aligned configuration enables:
+
+- Consistent Firebase integration
+- Seamless deployment and hosting
+- Correct application naming and theming
+- Effective use of Progressive Web App (PWA) features
+
+---
+
+## 2. Configuring `vue.config.js`
+
+The `vue.config.js` file defines build and runtime configuration for the Vue.js application, especially for production-ready builds and PWA setup.
+
+### Key Configuration Elements
+
+- **PWA Settings**
+  - Customize app name, theme color, and icons
+  - Configure the service worker for offline support
+
+- **Build Optimization**
+  - Disable prefetch to improve initial load speed
+  - Transpile dependencies (e.g., Vuetify) for compatibility
+
+### Sample `vue.config.js`
+
+```js
+module.exports = {
+  chainWebpack: config => {
+    config.plugins.delete('prefetch');
+  },
+  transpileDependencies: [
+    'vuetify'
+  ],
+  productionSourceMap: false,
+  pwa: {
+    name: 'Aura Main',
+    workboxPluginMode: 'InjectManifest',
+    themeColor: '#4A90E2',
+    msTileColor: '#4A90E2',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    manifestOptions: {
+      background_color: '#ffffff'
+    },
+    workboxOptions: {
+      swSrc: './src/sw.js',
+      swDest: 'service-worker.js'
+    }
+  }
+};
+```
+
+#### Action:
+- Modify the `name`, `themeColor`, and other PWA fields to match your community branding.
+- Confirm that the service worker source (`swSrc`) path is correct.
+
+<Tip>
+For branding consistency, change `name` to your community or project name. This is reflected in installed PWA tiles and browser UI.
+</Tip>
+
+---
+
+## 3. Aligning Firebase Project Settings
+
+Both Aura Main and Aura Admin must reference the **same Firebase project** to share data and authentication seamlessly.
+
+### Files to Synchronize
+
+- `.firebaserc`
+
+  This JSON file defines the default Firebase project for the app.
+
+  Example:
+  ```json
+  {
+    "projects": {
+      "default": "myaurapp"
+    }
+  }
+  ```
+
+- `src/config/firebase.js`
+
+  This JavaScript file contains your Firebase project configuration keys:
+
+  ```js
+  const firebaseConfig = {
+    apiKey: "AIzaSyCOl0qzkhCDmyWeeIT8AZe4xyJJlIfU5gE",
+    authDomain: "myaurapp.firebaseapp.com",
+    databaseURL: "https://myaurapp.firebaseio.com",
+    projectId: "myaurapp",
+    storageBucket: "myaurapp.appspot.com",
+    messagingSenderId: "419511997060",
+    appId: "1:419511997060:web:ce7aa0d308f6b484f868d1"
+  };
+  ```
+
+### Step-by-step
+
+<Steps>
+<Step title="Verify Firebase Project in .firebaserc">
+Open `.firebaserc` in both Aura Main and Aura Admin repositories. Confirm the `default` project ID matches your Firebase Console project ID.
+</Step>
+<Step title="Update firebase.js">
+Open `src/config/firebase.js` and replace all config fields from your Firebase Console project’s web app configuration.
+</Step>
+<Step title="Test Firebase Connection">
+Run Aura locally and confirm data loads from Firestore and authentication works.
+</Step>
+</Steps>
+
+<Warning>
+Mismatched Firebase project IDs between Aura Main and Aura Admin cause data inconsistencies or failures loading events, teams, and configurations.
+</Warning>
+
+---
+
+## 4. Environment Variables and Build-Time Settings
+
+Aura does not heavily rely on `.env` files, but build-time files like `vue.config.js` and other config modules hold key environment-specific information.
+
+### Best Practices
+
+- Always keep your Firebase project config updated.
+- Use consistent naming conventions for themes and app names to avoid confusion.
+- Avoid hardcoding sensitive keys in public repos; limit this to public config data only.
+
+---
+
+## 5. Synchronizing Configuration Across Aura Main and Aura Admin
+
+Since these apps work jointly:
+
+- Ensure identical Firebase project references.
+- Share branding configurations (names, logos) where possible.
+- Keep versions of config files in sync to prevent drift during deployments.
+
+<Tip>
+Maintaining synced configuration prevents runtime errors, especially related to Firestore reads/writes and authentication.
+</Tip>
+
+---
+
+## 6. Troubleshooting Tips
+
+### Problem: Configuration Mismatch Errors
+- Confirm `.firebaserc` `default` key matches Firebase Console project ID on both apps.
+- Ensure `firebase.js` uses valid and current API keys and project identifiers.
+
+### Problem: Service Worker Not Updating
+- Check PWA config in `vue.config.js` is correct.
+- Clear browser cache and unregister previous service workers during development.
+
+### Problem: Firebase Services Not Available
+- Verify Firebase project settings include enabled Firestore, Authentication, and Storage services.
+- Confirm Firebase config keys are correct and complete.
+
+---
+
+## 7. Next Steps
+
+After configuring the project environment and ensuring both Aura Main and Aura Admin connect to the same Firebase backend:
+
+- Proceed to [Running Aura Locally & Quick Validation](../run-validate-deploy/local-run-validation) to test your setup.
+- Explore [Configuring Firebase Integration](../install-configure/firebase-setup) for securing and managing Firebase access.
+- Begin branding customization with the [Theme Switching & Offline Operation (PWA)](/guides-tab/best-practices/using-theme-and-pwa-features) guide.
+
+---
+
+## 8. Additional References
+
+- [.firebaserc File Explained](https://firebase.google.com/docs/cli#project_aliases)
+- [Vue CLI PWA Plugin Configuration](https://cli.vuejs.org/core-plugins/pwa.html#configuration)
+- [Firebase Web Setup and Config](https://firebase.google.com/docs/web/setup)
+
+
+---
+
+# Summary Diagram: Configuration Flow
+
+```mermaid
+flowchart TD
+  A["Developer"] --> B["clone Aura Main repo"]
+  B --> C["update firebase.js with Firebase keys"]
+  B --> D["set vue.config.js PWA & build settings"]
+  C & D --> E[".firebaserc updated with Firebase Project"]
+  E --> F["Run Aura Main locally"]
+  F --> G["Verify Firestore and auth connectivity"]
+  G --> H["Sync configs with Aura Admin repo"]
+  H --> I["Confirm env parity across projects"]
+  I --> J["Deploy with consistent config"]
+
+  classDef startend fill:#0b74de,stroke:#fff,color:#fff,font-weight:bold;
+  class A,J startend;
+```
+
+
+---
+
+*This concludes the project and environment configuration guide for Aura. Proper setup here ensures a smooth development and deployment experience aligned with your Firebase backend and theming needs.*
