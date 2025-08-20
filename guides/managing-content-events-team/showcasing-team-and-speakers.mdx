@@ -1,0 +1,154 @@
+---
+title: "Showcasing Team Members & Speakers"
+description: "Learn to leverage Aura’s public directory features for self-branding of team members and speakers. Explore how public URLs, detailed profiles, and social links can help promote your community leaders and guest speakers."
+---
+
+# Showcasing Team Members & Speakers
+
+Harness Aura’s public directory features to spotlight your community’s leaders, speakers, and team members. This guide walks you through how Aura enables self-branding via detailed profiles with personalized bios, session histories, social media links, and public URLs—empowering your organization to celebrate and promote talent effectively.
+
+---
+
+## 1. Understanding the Purpose of This Page
+
+### What This Guide Will Help You Accomplish
+This page is designed to help you showcase your community’s team members and speakers through Aura’s public directory features. You will learn how Aura displays comprehensive profiles that amplify the presence of your community leaders and guest speakers.
+
+### Why Showcasing Individuals Matters
+Public profiles build trust, attract engagement, and encourage participation by spotlighting the expertise and personalities within your tech community. Aura’s features make it easy to create professional, accessible presentations that users can share.
+
+---
+
+## 2. Key Features of the Team & Speaker Showcase
+
+- **Public URLs**: Each team member and speaker has a unique URL that can be shared outside the Aura platform.
+- **Detailed Profiles**: Profiles include name, designation, company affiliation, location, biography, and social media links.
+- **Session Histories**: Speakers’ session involvement in past or upcoming events is clearly listed.
+- **Responsive Design**: Profiles adapt for mobile and desktop, ensuring a polished user experience on any device.
+- **Visual Identity**: Profile photos and well-organized content sections support personal branding.
+
+---
+
+## 3. How to Access and Navigate Team & Speaker Profiles
+
+### From the Speakers and Team Listing
+The main speakers and team listing pages provide a grid or card-based overview of all members. Clicking a profile card directs users to individual detail pages.
+
+### Navigation Flow
+1. **Open the Speakers or Team page**: Browse all members.
+2. **Select a member**: Click on a specific speaker or team card to open their profile.
+3. **View detailed profile**: Contains biography, social links, and associated sessions or roles.
+
+---
+
+## 4. Step-by-Step: Managing and Showcasing Team & Speaker Profiles
+
+### Step 1: Prepare Profiles for Public Display
+Ensure your team members and speakers have the required details registered in the Aura Admin interface (names, photos, bios, social links, company info).
+
+### Step 2: Confirm Visibility Settings
+Profiles should be marked as **visible** in Aura to appear in public listings and searches.
+
+### Step 3: Access Public Directory
+Navigate to the `/speakers` or `/team` paths on your Aura site to view the public directory pages where members are listed.
+
+### Step 4: Explore Individual Profiles
+- Click on a profile card to visit the detailed page.
+- Check their biography section, social media icons, and list of sessions or team roles.
+
+### Step 5: Share Public URLs
+Copy the profile URL from the browser address bar to share externally, invite networking, or promote event speakers.
+
+---
+
+## 5. Practical Tips and Best Practices
+
+- **Keep Bios and Social Links Updated**: Regular updates keep profiles fresh and engaging.
+- **Use Clear, Professional Photos**: Visual identity is key for first impressions.
+- **Enable Visibility Only When Ready**: Hidden profiles help control content staging.
+- **Link Speakers to Sessions**: Connect speakers to event sessions so visitors can explore their contributions.
+- **Utilize Public URLs in Marketing**: Amplify reach by sharing these links in newsletters and social media.
+
+---
+
+## 6. Common Pitfalls and Troubleshooting
+
+### Profiles Not Showing Up in Directory
+- Verify the **visible** attribute is enabled for the profile.
+- Check network issues or API response errors when fetching speaker data.
+
+### Missing Profile Images
+- Confirm image URLs are correctly configured.
+- Ensure images are uploaded to the CDN or hosting service.
+
+### Incorrect or Missing Social Links
+- Use the Aura Admin panel to edit and verify valid social URLs.
+
+### Speaker Sessions Not Displayed
+- Confirm speakers are correctly assigned to event sessions in the backend.
+
+### Handling "Profile Not Found" Errors
+- This occurs if the profile ID does not exist; verify the URL and existence of the speaker or team member.
+
+---
+
+## 7. Example Scenario: Viewing a Speaker Profile
+
+Imagine a conference attendee wants to learn more about 'Jane Doe', a speaker at your community event:
+
+1. The attendee visits the `/speakers` page and locates Jane’s profile card featuring her photo and company.
+2. They click Jane’s card, opening her detailed profile.
+3. They see her bio, social media icons, and list of sessions she will present.
+4. The attendee shares Jane’s public URL on Twitter to invite others to her sessions.
+
+This workflow highlights Aura’s ease of self-branding and community engagement.
+
+---
+
+## 8. Additional Resources & Next Steps
+
+- [Publishing and Managing Events Guide](../managing-content-events-team/publishing-and-managing-events): Learn how to integrate speakers into event promotion.
+- [Aura Structure and Navigation Guide](../getting-started-workflows/understanding-aura-structure-and-navigation): Understand how this page fits in Aura’s overall navigation.
+- [Troubleshooting Common Issues](../../getting-started/troubleshooting-validation/common-issues): Resolve setup or display problems.
+- Explore the Aura Admin interface to add or update team and speaker profiles.
+
+
+---
+
+## Appendix: Example Vue Components Involved
+
+---
+
+### Speaker Profile Card (Excerpt)
+```vue
+<template>
+  <div @click="$router.push({ path: '/speakers/' + da.id })" style="cursor: pointer;" class="fill-height">
+    <v-avatar size="100" v-ripple>
+      <v-img :src="getImgUrl(da.image, 'profile.jpg')">
+        <template v-slot:placeholder>
+          <v-row class="fill-height ma-0" align="center" justify="center">
+            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+          </v-row>
+        </template>
+      </v-img>
+    </v-avatar>
+    <p class="mt-3 mb-0 google-font" style="font-size:110%">{{ da.name }}</p>
+    <p class="mt-1 mb-0 google-font" style="font-size:80%">{{ da.company.name }}</p>
+  </div>
+</template>
+```
+
+### Speaker Detail Profile (Mobile & Desktop)
+- Dynamically fetches speaker info by ID
+- Displays bio, image, social links, and sessions
+- Shows loading state and "not found" message when missing
+
+---
+
+<Tip>
+Utilize the public URLs of speaker and team profiles to boost external visibility by linking them in your event promotions, social media, and organization website.
+</Tip>
+
+<Note>
+Ensure that speakers and team members have their visibility flag set to true to appear in the public directories.
+</Note>
