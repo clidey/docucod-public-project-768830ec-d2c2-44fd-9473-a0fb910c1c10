@@ -1,0 +1,157 @@
+---
+title: "Security Hardening"
+description: "Offers practical recommendations for locking down Aura deployments, including Firebase Hosting security rules, HTTPS configuration, protection of sensitive API keys, and essential steps to keep your site and data secure."
+---
+
+# Security Hardening
+
+Securing your Aura deployment is not just a best practice—it's essential to protect your site, your users, and your data. This guide walks you through the critical steps to fortify your production environment, focusing on Firebase Hosting security rules, HTTPS configuration, safeguarding API keys, and overall site security. Each recommendation here empowers you to lock down your deployment against common threats and vulnerabilities with confidence.
+
+---
+
+## 1. Firebase Hosting Security Rules
+
+Firebase Hosting serves your Aura application files and static assets. Proper security rules at this layer help prevent unauthorized access and ensure your content is delivered safely.
+
+### Key Recommendations:
+- **Validate Hosting Access with Authorized Domains:** Configure your Firebase Hosting to restrict delivery to approved domains only, preventing content spoofing or abuse.
+
+- **Configure Custom Headers for Security:** Add HTTP response headers such as `Content-Security-Policy`, `X-Frame-Options`, and `Strict-Transport-Security`. This reduces the risk of XSS, clickjacking, and other injection attacks.
+
+- **Limit Public Access to Sensitive Paths:** If your deployment includes any backend endpoints or admin interfaces, configure Firebase rewrites and rules carefully to restrict access only to authenticated or authorized users.
+
+- **Use Firebase Security Rules Where Applicable:** If you integrate with Firebase Realtime Database or Firestore, ensure security rules restrict data operations only to authorized users and roles.
+
+### Example: Adding Security Headers in firebase.json
+```json
+{
+  "hosting": {
+    "headers": [
+      {
+        "source": "/**",
+        "headers": [
+          { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
+          { "key": "X-Frame-Options", "value": "DENY" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "Referrer-Policy", "value": "no-referrer" },
+          { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+<Tip>
+Regularly review Firebase Hosting and Firestore security rules. Changes in deployment or features often require updates to your security policies to avoid exposing new attack surfaces.
+</Tip>
+
+---
+
+## 2. Enforcing HTTPS
+
+Security begins with encrypted communication. Firebase Hosting automatically provisions SSL certificates and serves your site over HTTPS, but take these steps to fully enforce it:
+
+- **Force HTTPS in Firebase Hosting:** Set up redirects in your `firebase.json` to redirect all HTTP traffic to HTTPS.
+
+- **Ensure External Resources Use HTTPS:** Verify that external APIs, libraries, or assets linked in your app use HTTPS URLs.
+
+### Example: Redirect HTTP to HTTPS
+```json
+{
+  "hosting": {
+    "redirects": [
+      {
+        "source": "/**",
+        "destination": "https://your-domain.com/**",
+        "type": 301
+      }
+    ]
+  }
+}
+```
+
+<Check>
+Verify your site URL in the browser always shows HTTPS and the connection is secure before sharing or exposing the deployment publicly.
+</Check>
+
+---
+
+## 3. Protecting Sensitive API Keys and Credentials
+
+Your Aura deployment interacts with Firebase and potentially other services using API keys and credentials. While Firebase API keys are not secret, other credentials used in your backend or integration flows need protection.
+
+### Recommended Practices:
+- **Do Not Embed Private Keys in Client Code:** Firebase config keys are intended for client use and are safe as they appear in your frontend config. However, never expose admin or service account keys in your client bundle.
+
+- **Use Environment Variables for Secrets in Backend:** Store sensitive credentials outside your source code using environment variables or Firebase Functions environment config.
+
+- **Restrict API Key Usage:** Use API key restrictions in the Google Cloud Console for your Firebase project's API keys by limiting allowed referrers or IP addresses.
+
+- **Rotate Keys Regularly:** Establish a key rotation schedule to limit exposure if a key is compromised.
+
+<Tip>
+Audit all third-party integrations and ensure their credentials are stored securely, not hard-coded or exposed in public repos.
+</Tip>
+
+---
+
+## 4. Additional Practical Security Steps
+
+Beyond the main pillars, these actionable steps further strengthen your deployment:
+
+- **Enable Firebase Authentication and Role-Based Access Control (RBAC):** Protect admin or user-sensitive areas by enforcing sign-in and role checks.
+
+- **Monitor Analytics and Logs for Suspicious Activities:** Set up Firebase and Google Cloud alerts for unusual traffic, access patterns, or error spikes.
+
+- **Implement Content Security Policies (CSP):** Tailor CSP headers to minimize injection risk, blocking unauthorized scripts or resources.
+
+- **Regularly Update Dependencies and Firebase SDK:** Security patches and enhancements often come with updates. Stay on the latest stable versions.
+
+- **Backup Critical Data:** Use Firebase’s backup options or export Firestore data periodically to safeguard against data loss.
+
+---
+
+## 5. Troubleshooting Common Security Issues
+
+Even with best practices, misconfiguration can happen. Here are quick resolutions for frequent problems:
+
+<AccordionGroup title="Troubleshooting Security Issues">
+<Accordion title="Site Serving Over HTTP Instead of HTTPS">
+Check your `firebase.json` for proper redirects. Confirm SSL provisioning in Firebase Console. Avoid caching old HTTP-only links.
+</Accordion>
+<Accordion title="Unauthorized Users Accessing Restricted Pages">
+Verify Firebase Authentication setup and rules. Inspect your client-side route guards or authorization logic for holes.
+</Accordion>
+<Accordion title="API Keys Getting Exposed in Public Repos">
+Audit your codebase for secrets. Use `.gitignore` and environment variable management. Rotate your keys immediately.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Summary
+
+Implementing these security hardening measures ensures your Aura deployment operates safely and reliably. From configuring Firebase Hosting rules and enforcing HTTPS to protecting sensitive keys and monitoring ongoing security posture, each step you take significantly reduces risks. Establish a routine for reviewing security settings and updates to maintain robust defenses over time.
+
+For a comprehensive deployment workflow, consult the [Production Deployment Workflow](/deployment/prod-deployment-workflow/environment-setup) and for operational continuity visit [Monitoring and Logging](/deployment/operations-monitoring-maintenance/monitoring-logging).
+
+
+---
+
+## Additional Resources
+
+- [Firebase Hosting Security Rules](https://firebase.google.com/docs/hosting/full-config#security)
+- [Google Cloud API Key Best Practices](https://cloud.google.com/docs/authentication/api-keys#best_practices)
+- [Content Security Policy (CSP) Guide](https://developers.google.com/web/fundamentals/security/csp)
+- [Aura GitHub Repository](https://github.com/gdg-x/aura)
+
+
+---
+
+This guide ties closely with deployment configuration and ongoing maintenance. Protect your users and data by embedding these security foundations in every Aura deployment.
+
+
+---
+
+<Source url="https://github.com/gdg-x/aura" branch="main" paths={[{"path": "firebase.json", "range": "1-50"}, {"path": "README.md", "range": "1-75"}]} />

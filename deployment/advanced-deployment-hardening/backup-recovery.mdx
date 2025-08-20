@@ -1,0 +1,136 @@
+---
+title: "Backup and Disaster Recovery"
+description: "Explains options for backing up configuration and recovering your Aura site in the case of failure. Offers specific advice on managing your Firebase project safely, exporting/importing configuration, and restoring environments quickly."
+---
+
+# Backup and Disaster Recovery
+
+Ensuring the availability and integrity of your Aura deployment is paramount. This guide empowers you to back up your Aura site’s configuration safely, manage your Firebase project responsibly, and recover quickly from failures. By following these best practices, you will protect your investment in Aura’s configuration and minimize downtime.
+
+---
+
+## 1. Why Backup and Disaster Recovery Matter
+
+Imagine a scenario where unexpected errors, data corruption, or misconfigurations cause your Aura site to malfunction. Without a backup strategy, restoring your site could become a complex, time-consuming task that interrupts your users' experience. This guide helps you avoid such scenarios by equipping you with practical backup and recovery details, so you’re prepared to recover swiftly and confidently.
+
+---
+
+## 2. Managing Your Firebase Project Safely
+
+Your Aura site is tightly integrated with Firebase services; thus, safeguarding your Firebase project is critical.
+
+- **Restrict Access:** Limit Firebase Console access to trusted team members only.
+- **Use Service Accounts:** Where possible, use Firebase service accounts with scoped permissions rather than user credentials.
+- **Enable Multi-Factor Authentication (MFA):** Protect sign-in to Firebase Console with MFA.
+- **Audit Changes:** Regularly review Firebase project activity logs to detect unauthorized access or configuration changes.
+
+<Tip>
+Proactively managing Firebase project permissions and audit logs reduces the risk of accidental or malicious changes that could disrupt your Aura environment.
+</Tip>
+
+---
+
+## 3. Exporting Aura Configuration
+
+Aura’s configuration defines the behavior and structure of your site. Regularly exporting this configuration is essential to have a safe snapshot that can be restored if needed.
+
+### What to Export:
+- Firebase project settings relevant to Aura
+- Firestore rules and indexes
+- Hosting configurations
+- Environment variables and secrets
+- Aura-specific config files (e.g., JSON or YAML files holding UI or functional settings)
+
+### How to Export:
+1. Navigate to your Firebase Console.
+2. Export Firestore rules and indexes using the Firebase CLI:
+   ```bash
+   firebase firestore:rules > firestore.rules
+   firebase firestore:indexes > firestore.indexes.json
+   ```
+3. Export hosting configuration:
+   ```bash
+   firebase hosting:sites:get > hosting-config.json
+   ```
+4. Backup your local Aura configuration files by copying them to a secure location or versioning them in your source control.
+
+<Tip>
+Automate these exports using scripts and schedule regular backups to avoid manual errors.
+</Tip>
+
+---
+
+## 4. Importing Configuration and Restoring Your Environment
+
+When disaster strikes, quick restoration preserves uptime and user confidence.
+
+### Importing Configuration:
+1. Use the Firebase CLI to import Firestore rules and indexes:
+   ```bash
+   firebase firestore:rules:set firestore.rules
+   firebase firestore:indexes:create firestore.indexes.json
+   ```
+2. Re-deploy Firebase hosting with your saved configurations:
+   ```bash
+   firebase deploy --only hosting
+   ```
+3. Restore your Aura-specific configuration files by copying backed-up files into the deployment directory.
+4. Verify environment variables and secrets are correctly set in your Firebase project or environment.
+
+### Validating Recovery Success:
+- Access the deployed site to ensure it loads as expected.
+- Validate that Firestore security rules are intact and functioning.
+- Test critical user journeys to confirm configuration correctness.
+
+<Check>
+Perform routine recovery drills to ensure your backup and restore procedures work flawlessly under pressure.
+</Check>
+
+---
+
+## 5. Best Practices for Backup and Recovery
+
+- **Backup Frequency:** Schedule backups at a cadence that reflects your rate of configuration changes — daily or weekly is common.
+- **Version Control:** Maintain copies of configuration exports in a version control system such as Git.
+- **Secure Storage:** Store backups securely, employing encryption and access control.
+- **Documentation:** Keep clear instructions on during recovery procedures accessible to responsible team members.
+- **Environment Separation:** Backup and restore environments individually (e.g., dev, staging, production) to avoid cross-contamination.
+
+---
+
+## 6. Common Pitfalls and Troubleshooting
+
+<AccordionGroup title="Troubleshooting Backup and Recovery Issues">
+<Accordion title="Backup Inconsistency or Missing Data">
+Manual backups might miss critical configuration aspects.
+
+- Always automate exports where possible.
+- Use Firebase CLI commands rather than copying files manually.
+- Validate backups after creation.
+</Accordion>
+<Accordion title="Restore Fails Due to Permission Issues">
+Ensure that the account used for restoration has adequate permissions for all Firebase services.
+
+- Use service accounts with appropriate roles.
+- Check Firebase IAM roles if you encounter denied actions.
+</Accordion>
+<Accordion title="Configuration Drift Between Environments">
+Different environments might drift in configuration leading to unexpected issues.
+
+- Apply changes across all environments through managed pipelines.
+- Use environment-specific config files with clear naming conventions.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 7. Next Steps and Related Resources
+
+- [Environment Setup & Configuration](/deployment/prod-deployment-workflow/environment-setup): Prepare your environments before backup.
+- [Troubleshooting Deployment & Common Issues](/deployment/operations-monitoring-maintenance/troubleshooting-deployment): Resolve deployment-related problems effectively.
+- Firebase documentation on [Backing up and restoring Firestore](https://firebase.google.com/docs/firestore/manage-data/export-import) for further depth.
+
+
+---
+
+_Backup and Disaster Recovery planning solidifies your Aura deployment's reliability and business continuity. By incorporating these procedures into your operational workflows, you build resilience against unexpected challenges._

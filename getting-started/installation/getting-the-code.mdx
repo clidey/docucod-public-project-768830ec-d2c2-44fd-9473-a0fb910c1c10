@@ -1,0 +1,144 @@
+---
+title: "Getting the Code"
+description: "Explains how to fork, clone, and manage both Aura Main and Aura Admin repositories. Emphasizes the need to use the same Firebase project for both codebases and the practical steps for copying repositories locally."
+---
+
+# Getting the Code
+
+This guide provides clear, step-by-step instructions to fork, clone, and prepare the Aura Main and Aura Admin repositories on your local machine. You’ll learn exactly how to manage both codebases and how to ensure they share the same Firebase project—this is critical for a seamless setup.
+
+---
+
+## 1. Why You Need Both Aura Main and Aura Admin
+
+Aura Main is the client-facing Progressive Web App that community members interact with. Aura Admin is the backend management console where you configure events, teams, speakers, and other community content.
+
+> **Key:** Both repositories must use the **same Firebase project** so that the data managed in Aura Admin is correctly displayed by Aura Main.
+
+## 2. Forking the Repositories
+
+You must fork both repositories to your own GitHub account before cloning locally. This lets you customize, update, and deploy your version independently.
+
+### Steps to Fork:
+
+1. Go to the Aura repository: [https://github.com/gdg-x/aura](https://github.com/gdg-x/aura)
+2. Click the **Fork** button at the top-right of the page.
+3. Repeat the process on the Aura Admin repository: [https://github.com/gdg-x/aura-admin](https://github.com/gdg-x/aura-admin).
+
+<Note>
+If you don’t fork both repositories, you won’t be able to deploy or manage the app properly.
+</Note>
+
+## 3. Cloning the Repositories Locally
+
+Once forked, clone both repos to your development machine.
+
+### Example Git commands:
+
+```bash
+# Clone Aura Main
+git clone https://github.com/<your-github-username>/aura.git
+
+# Clone Aura Admin
+git clone https://github.com/<your-github-username>/aura-admin.git
+```
+
+Replace `<your-github-username>` with your actual GitHub username.
+
+### Tips:
+- Clone the repositories in separate directories.
+- Keep them consistent and easily accessible.
+
+## 4. Connecting both Repositories to the Same Firebase Project
+
+Firebase is where community data lives. To synchronize data correctly:
+
+1. Use the **same Firebase project** for both Aura and Aura Admin — this ensures the admin updates reflect immediately in the main app.
+2. When you create your Firebase project in the [Firebase Console](https://console.firebase.google.com), note down the project ID and SDK configuration.
+
+## 5. Firebase Web App Configuration for Aura Main
+
+After creating your Firebase project:
+
+1. In the Firebase Console, go to **Project Settings > General**.
+2. Scroll to **Your Apps** section and add a new Web App if you haven’t already.
+3. Copy the Firebase config object shown under **Firebase SDK snippet > Config**.
+
+This will look similar to:
+
+```js
+apiKey: "Axxxxxxxxxxxxxxxxxxx",
+authDomain: "xxxxxx.firebaseapp.com",
+databaseURL: "https://xxxxxxxx.firebaseio.com",
+projectId: "xxxxxxxxx",
+storageBucket: "xxxxxxx.appspot.com",
+messagingSenderId: "xxxxxxxxxxx",
+appId: "1:xxxxxxxxx:web:xxxxxxx"
+```
+
+4. Paste this config into your Aura Main project under:
+
+- `src/config/firebase.js`
+
+Modify the existing firebase config file and replace the placeholder values with your Firebase app’s credentials.
+
+<Warning>
+Make sure you do not expose sensitive keys publicly beyond your development environment.
+</Warning>
+
+## 6. Summary of Setup Locations
+
+| Repository  | Purpose                          | Firebase Connection                  |
+|-------------|---------------------------------|-----------------------------------|
+| Aura Main   | User-facing Progressive Web App | Firebase config in `src/config/firebase.js` |
+| Aura Admin  | Admin management console         | Uses same Firebase project (configured separately in its own repo) |
+
+## 7. Ready to Move Forward?
+
+After forking, cloning, and connecting your repos to the same Firebase project, you’re set to:
+
+- Install dependencies
+- Initialize environment variables
+- Run your first build and local app
+
+These next steps are covered in the following guides:
+
+- [Installing Dependencies](/getting-started/installation/installing-dependencies)
+- [Initializing Project & Environment](/getting-started/installation/first-project-setup)
+
+---
+
+## Troubleshooting Tips
+
+<AccordionGroup title="Common Issues and Solutions">
+<Accordion title="Firebase Project Mismatch">
+If Aura Main and Aura Admin use different Firebase projects, data won’t sync. Double-check the Firebase project ID used in `firebase.js` in Aura Main and that Aura Admin is configured for the same project.
+</Accordion>
+<Accordion title="GitHub Fork Mistakes">
+Ensure you fork both repos under your GitHub account, not just clone the upstream. This enables you to push changes and deploy your custom build.
+</Accordion>
+<Accordion title="Cloning Paths Confusion">
+Avoid cloning both repos into nested folders. Keep them side-by-side in the directory so they can be managed and run independently.
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Keep your Firebase project credentials consistent between Aura Admin and Aura Main to avoid sync issues.
+</Tip>
+
+---
+
+## Additional Resources
+
+- [Aura Main GitHub Repository](https://github.com/gdg-x/aura)
+- [Aura Admin GitHub Repository](https://github.com/gdg-x/aura-admin)
+- [Firebase Console](https://console.firebase.google.com)
+- [Installing Dependencies Guide](/getting-started/installation/installing-dependencies)
+
+---
+
+By following these instructions, you will have the Aura codebases ready and properly connected to your Firebase backend, enabling you to move confidently into installation, configuration, and deployment.
+
+---
+
+_Last updated for Aura version 3.1.2_

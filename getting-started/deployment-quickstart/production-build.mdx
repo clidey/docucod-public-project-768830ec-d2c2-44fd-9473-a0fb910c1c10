@@ -1,0 +1,214 @@
+---
+title: "Building for Production"
+description: "Learn how to create a production-ready build of Aura. This covers running the appropriate commands to bundle your app, preparing optimized assets, and meeting hosting requirements."
+---
+
+# Building for Production
+
+Learn how to create a production-ready build of Aura. This guide walks you through bundling your app, optimizing assets, and preparing your build to meet hosting requirements.
+
+---
+
+## 1. Prerequisites
+
+Before building for production, ensure the following:
+
+- **Local Development Environment Ready**: You have successfully installed dependencies and run Aura locally in development mode. Refer to [Running Aura Locally & Initial Validation](../installation-and-configuration/local-run-validation).
+- **Firebase Configuration Completed**: Your Firebase project is configured to support your app. Confirm proper setup with [Firebase Integration & Configuration](../installation-and-configuration/firebase-configuration).
+- **Aura Admin Setup**: Aura Main app expects the Aura Admin to be configured on the same Firebase project. See [Aura Admin Setup Prerequisite](../setup-prerequisites/aura-admin-notice).
+- **Node.js and npm Available**: Node.js (version 12 or later) and npm are installed on your system.
+
+<Tip>
+Make sure your app runs flawlessly in development mode before proceeding. This ensures the production build will bundle correctly.
+</Tip>
+
+## 2. Production Build Overview
+
+Building for production creates an optimized, bundled version of Aura that is smaller, faster, and ready to be deployed to your hosting environment.
+
+Key aspects of the build process:
+
+- Minifies JavaScript and CSS files
+- Removes development-only code
+- Bundles all application modules into optimized chunks
+- Generates assets in the `dist` directory
+
+The build output meets Firebase Hosting requirements out of the box.
+
+## 3. Step-by-Step Production Build Instructions
+
+Follow these steps from your Aura project root directory:
+
+<Steps>
+<Step title="Install Dependencies">
+Run this once if dependencies are not installed:
+
+```bash
+npm install
+```
+
+This installs Vue, Vuetify, Firebase SDK, and all other necessary packages.
+</Step>
+
+<Step title="Run the Production Build">
+Execute the build command:
+
+```bash
+npm run build
+```
+
+Expected output:
+- Compilation process with progress shown
+- Assets created in a new `dist` folder
+
+This command uses Vue CLI's built-in production mode which disables source maps for better performance.
+
+If the build finishes without errors, your production files are ready.
+</Step>
+
+<Step title="Verify Build Artifacts">
+Examine the `dist` directory created:
+
+```
+dist/
+├── css/
+├── js/
+├── favicon.ico
+├── index.html
+└── manifest.json
+```
+
+- `index.html`: The main entry HTML
+- `css/` and `js/`: Bundled CSS and JavaScript assets
+
+Ensure these files exist and have recent timestamps.
+</Step>
+</Steps>
+
+## 4. Key Configuration Details
+
+Aura's production build respects the following important configuration files:
+
+- **vue.config.js**: Controls webpack build optimizations including disabling prefetch to improve load performance and service worker setup for PWA support.
+- **firebase.json**: Defines Firebase Hosting settings such as the `dist` directory as the public folder and routing all requests to `index.html` to support SPA nature.
+
+Example snippet from `firebase.json`:
+
+```json
+{
+  "hosting": {
+    "site": "myaurapp",
+    "public": "dist",
+    "rewrites": [ {
+        "source": "**",
+        "destination": "/index.html"
+    } ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+```
+
+Ensure your Firebase Hosting points to the `dist` folder that contains the production build assets.
+
+## 5. Preparing for Hosting
+
+To meet hosting environment needs, consider the following:
+
+- **Service Worker Enabled**: Aura includes service worker registration for offline support and efficient caching.
+- **No Source Maps**: Disabled in production for security and size reduction.
+- **Proper Rewrite Rules**: SPA fallback routing enabled through Firebase configuration.
+
+<Tip>
+If you plan to deploy your app on Firebase Hosting, make sure you have initialized Firebase Hosting with `firebase init hosting` and linked your project. The build output fits seamlessly here.
+</Tip>
+
+## 6. Common Pitfalls & Troubleshooting
+
+<AccordionGroup title="Build Issues and Solutions">
+<Accordion title="Build Fails with Errors">
+- **Cause**: Missing dependencies or syntax errors in code.
+- **Fix**: Run `npm install` to update modules. Check console output for specific error lines and correct code.
+
+If unfamiliar with errors, review earlier setup and validation steps.
+</Accordion>
+
+<Accordion title="Build Is Successful but Deploy Shows Blank Screen">
+- **Cause**: Hosting rewrite rules missing or incorrectly configured.
+- **Fix**: Ensure your `firebase.json` rewrite routes all URLs to `/index.html`.
+
+- Double-check that the `dist` directory is used as your public directory.
+</Accordion>
+
+<Accordion title="Assets Not Loading or Broken Links">
+- **Cause**: Incorrect base URL or cached old files.
+- **Fix**: Clear browser cache and confirm your deployment serves assets from the correct directory.
+
+- Confirm the base href in `public/index.html` matches your hosting environment.
+</Accordion>
+</AccordionGroup>
+
+## 7. Next Steps and Deployment
+
+Once your production build is ready and verified, you are prepared to deploy your Aura app.
+
+Refer to the next guide [Deploying to Firebase Hosting](../deployment-quickstart/firebase-deployment) for detailed deployment instructions.
+
+Additionally, consider these enhancements:
+
+- **Setup Environment Variables** for production configuration tuning (covered in Deployment docs).
+- **Configure Monitoring & Logging** to observe app health post-deployment.
+
+---
+
+## Summary
+
+Building Aura for production bundles and optimizes your app for fast, secure hosting. This process generates deployable assets in the `dist` folder, prepared with proper Firebase hosting and service worker settings.
+
+With your production build clear and ready, deploying to hosting becomes straightforward.
+
+---
+
+## Useful References
+
+- [Running Aura Locally & Initial Validation](../installation-and-configuration/local-run-validation)
+- [Firebase Integration & Configuration](../installation-and-configuration/firebase-configuration)
+- [Aura Admin Setup Prerequisite](../setup-prerequisites/aura-admin-notice)
+- [Deploying to Firebase Hosting](../deployment-quickstart/firebase-deployment)
+
+---
+
+## Commands Summary
+
+```bash
+# Install dependencies
+npm install
+
+# Build production assets
+npm run build
+
+# Verify dist folder contents
+ls dist
+```
+
+<Tip>
+Keep your package.json scripts unchanged to maintain compatibility with Vue CLI's production build system.
+</Tip>
+
+---
+
+## Troubleshooting Quick Tips
+
+- If `npm run build` fails, check Node.js version and update dependencies.
+- Confirm that your environment variables and Firebase project IDs match across config files.
+- Clear local browser cache after deploying to avoid stale assets.
+
+---
+
+Congratulations! You have now built a production-ready version of Aura and laid the groundwork for seamless deployment.
+
+
+<Source url="https://github.com/gdg-x/aura" paths={[{"path": "vue.config.js", "range": "1-40"},{"path": "firebase.json", "range": "1-18"}]} branch="main" />

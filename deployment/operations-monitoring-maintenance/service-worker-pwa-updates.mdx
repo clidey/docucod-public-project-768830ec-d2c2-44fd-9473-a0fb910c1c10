@@ -1,0 +1,191 @@
+---
+title: "Service Worker, Offline Mode & App Updates"
+description: "Details how Aura leverages service workers for PWA features, including offline support and update notifications. Guides users in understanding the update process, troubleshooting offline errors, and managing cached assets."
+---
+
+# Service Worker, Offline Mode & App Updates
+
+Aura enhances user experience by leveraging Progressive Web App (PWA) capabilities through service workers. This guide helps you understand how Aura uses service workers to enable offline usage, manage app updates seamlessly, and handle cached assets effectively.
+
+---
+
+## Understanding the Role of Service Workers in Aura
+
+Service workers are scripts running in the background, separate from the main browser thread, crucial for enabling offline functionality and controlling asset caching. Aura uses [Workbox](https://developers.google.com/web/tools/workbox), a robust library that simplifies service worker management.
+
+Key benefits of Aura’s service worker implementation:
+
+- **Offline access:** Users can browse previously loaded pages and content without an internet connection.
+- **Efficient caching:** Critical assets and API data are cached proactively, reducing load times and data usage.
+- **Smooth updates:** The service worker detects new versions of the app and notifies users to refresh for the latest content.
+
+
+## How Aura Implements Service Worker & Offline Features
+
+### Service Worker Setup
+
+Aura uses the Workbox `InjectManifest` mode for its service worker. The custom service worker source file is located at `src/sw.js`, where caching strategies and update behaviors are defined.
+
+- Cache naming is centralized with the prefix `cache` for clarity and management.
+- The `precacheManifest` lists static assets (CSS, JS, images) generated during the build and injected into the service worker.
+- The service worker listens for messages, particularly to trigger `skipWaiting()`, allowing the new version to activate immediately.
+
+### Key configuration in `vue.config.js` for PWA:
+
+```js
+pwa: {
+  name: 'Aura Main',
+  workboxPluginMode: 'InjectManifest',
+  themeColor: '#4A90E2',
+  msTileColor: '#4A90E2',
+  appleMobileWebAppCapable: 'yes',
+  appleMobileWebAppStatusBarStyle: 'black',
+  manifestOptions: {
+    background_color: '#ffffff'
+  },
+  workboxOptions: {
+    swSrc: './src/sw.js',
+    swDest: 'service-worker.js',
+  },
+}
+```
+
+This setup ensures the service worker is bundled with custom rules and precached assets tailored to Aura.
+
+
+## The Update Process: How Aura Notifies Users of New Versions
+
+When a new version of the app is deployed and detected by the service worker, Aura handles the update with a user-friendly flow:
+
+1. The service worker downloads the new content in the background.
+2. Once ready, it dispatches a custom `swUpdated` event containing the service worker registration.
+3. The main Vue app listens for this event and shows a snackbar notification with a **Refresh** button.
+4. When the user clicks **Refresh**, it sends a `skipWaiting` message to the waiting service worker.
+5. The service worker takes control immediately, and the app reloads to load the new version.
+
+Example snippet from `src/App.vue` handling this:
+
+```js
+created() {
+  document.addEventListener('swUpdated', this.showRefreshUI, { once: true });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (this.refreshing) return;
+    this.refreshing = true;
+    window.location.reload();
+  });
+},
+methods: {
+  showRefreshUI(e) {
+    this.registration = e.detail;
+    this.snackBtnText = 'Refresh';
+    this.snackWithBtnText = 'New version available!';
+    this.snackWithButtons = true;
+  },
+  refreshApp() {
+    this.snackWithButtons = false;
+    if (!this.registration || !this.registration.waiting) return;
+    this.registration.waiting.postMessage('skipWaiting');
+  },
+}
+```
+
+This approach balances seamless updates with user control, ensuring users are aware of available improvements while letting them refresh at a convenient time.
+
+
+## Handling Offline Mode in Aura
+
+Aura gracefully supports offline mode through cached assets and IndexedDB persistence:
+
+- The Firestore database is configured with offline persistence to serve cached data even without connectivity.
+- Static site assets (HTML, CSS, JS, images) are cached on first load via the service worker.
+
+When offline:
+
+- Users see previously loaded content instantly.
+- If network requests fail (e.g., data updates), Aura maintains the last synced state.
+- A console log `No internet connection found. App is running in offline mode.` confirms offline operation.
+
+<Warning>
+**Network Issues:** If the app initially fails to load due to no connectivity, users might see a message in the UI: 'Either Your Internet is not Working or Site is not Configured'. Ensure the app is accessed at least once with an active internet connection to cache assets.
+</Warning>
+
+
+## Managing Cached Assets and Storage
+
+Aura’s service worker caches critical assets and precaches runtime files automatically with Workbox. This enables:
+
+- Faster repeat visits.
+- Reduced server load.
+- Improved resilience for intermittent networks.
+
+The cache naming is managed with the prefix `cache` to keep caches organized.
+
+<Info>
+The current implementation uses Workbox's precaching and runtime caching strategies defined in `src/sw.js`. Updates to assets trigger cache refreshes in the background automatically.
+</Info>
+
+
+## Troubleshooting Common Service Worker and Offline Issues
+
+<AccordionGroup title="Troubleshooting & Tips">
+  <Accordion title="App Does Not Update After Deploy">
+  If the update snackbar does not appear after deploying a new version:
+
+  - Confirm service worker registration logs in browser console.
+  - Verify `service-worker.js` and `precache-manifest` files have new hashes.
+  - Clear browser cache and reload.
+  - Make sure server headers are correctly delivering the updated service worker.
+  </Accordion>
+
+  <Accordion title="Offline Mode Shows No Data or Error">
+  When offline, if the app shows no data:
+
+  - Ensure the user has visited the app at least once online to cache data.
+  - Verify Firestore's offline persistence is enabled (already default in Aura).
+  - Check browser settings allow storage and service workers.
+  - Use browser DevTools Application tab to inspect Cache Storage and IndexedDB.
+  </Accordion>
+
+  <Accordion title="Service Worker Registration Fails">
+  If the service worker registration fails with errors:
+
+  - Confirm the app is served over HTTPS or localhost as service workers require secure contexts.
+  - Check for typos or path mismatches in `vue.config.js` (swSrc and swDest).
+  - Review `src/sw.js` for errors.
+  - Check browser compatibility and support for service workers.
+  </Accordion>
+
+  <Accordion title="Cached Content Stale After Update">
+  If old content persists after update:
+
+  - Trigger the refresh via the snackbar.
+  - Manually clear browser cache.
+  - Validate that the service worker's `skipWaiting` is called on update.
+  - Verify the Workbox precaching manifest is rebuilt during production build.
+  </Accordion>
+</AccordionGroup>
+
+
+## Best Practices & Recommendations
+
+- **Encourage users to refresh promptly** when the update snackbar appears to benefit from new features and fixes.
+- **Test offline behavior** by loading the app, then disconnecting and navigating to cached pages.
+- **Perform production builds** (`npm run build`) to ensure the service worker is updated with the latest files.
+- **Monitor browser console logs** for service worker lifecycle events and errors.
+- **Use Chrome DevTools Application panel** for inspecting service workers, cache storage, and offline data.
+
+
+---
+
+## Additional Resources
+
+- [Workbox Documentation](https://developers.google.com/web/tools/workbox)
+- [PWA Guide for Vue.js](https://pwa.nuxtjs.org/)
+- [Aura on GitHub](https://github.com/gdg-x/aura)
+- [Firebase Offline Data Persistence](https://firebase.google.com/docs/firestore/manage-data/enable-offline)
+- [Deploying Aura to Firebase Hosting](https://github.com/gdg-x/aura/blob/main/getting-started/deployment-quickstart/firebase-deployment.mdx)
+
+
+---
+
+By understanding Aura’s service worker lifecycle and caching strategy, you gain control over offline usage and app updates, ensuring your community enjoys a smooth, fast, and reliable experience in all network conditions.

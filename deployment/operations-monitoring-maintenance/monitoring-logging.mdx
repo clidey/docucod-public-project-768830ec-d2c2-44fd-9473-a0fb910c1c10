@@ -1,0 +1,149 @@
+---
+title: "Monitoring and Logging"
+description: "Introduces best practices for monitoring your Aura deployment using Firebase Hosting analytics and error logs. Explains how to use browser and Firebase tools to detect, log, and resolve runtime issues. Recommends extensions and setups for effective visibility."
+---
+
+# Monitoring and Logging
+
+Effective monitoring and logging are the cornerstones of maintaining a reliable and performant Aura deployment. This guide empowers you to proactively observe your Aura application’s behavior, capture runtime issues effortlessly, and resolve them swiftly using Firebase Hosting analytics and error logs. We will cover actionable best practices, setup recommendations, and tools to maximize your deployment’s visibility.
+
+---
+
+## Why Monitoring Matters for Aura
+
+Imagine you just launched Aura for your community, but you start hearing reports of page errors, slow load times, or unexpected behavior. Without insight into your live deployment, identifying root causes becomes a guessing game. Monitoring equips you with real-time data to:
+
+- Detect issues before users are widely affected
+- Understand user navigation and engagement patterns
+- Pinpoint and fix errors based on concrete logs and stack traces
+- Optimize performance continuously for seamless user experience
+
+Ensuring visibility into your Aura deployment through monitoring and logging is essential to deliver the vibrant and dependable community platform your users expect.
+
+---
+
+## Setting Up Monitoring for Aura
+
+Aura’s deployment on Firebase Hosting provides an excellent foundation for monitoring via Firebase’s built-in analytics and error logging tools.
+
+### Step 1: Enable Firebase Hosting Analytics
+
+1. **Access Firebase Console**: Navigate to your Firebase project associated with Aura.
+2. **Ensure Analytics is Enabled**: Under the Project Overview, verify that Google Analytics is enabled.
+3. **Review Metrics**: Firebase Analytics will automatically capture key events such as pageviews, session duration, and user engagement.
+
+### Step 2: Configure Error Logging
+
+Aura does not contain a custom error reporting service but leverages Firebase Hosting’s standard error logging mechanisms alongside browser console logs.
+
+- **Browser Console Logs**: Runtime errors and warnings are outputted to the browser console. These can be captured manually or via remote debugging tools.
+  
+- **Firebase Hosting Logs**: Access Firebase Hosting logs through Google Cloud Console to review deployment and runtime errors reported by the server.
+
+### Step 3: Use Firebase Crashlytics (Optional Enhancement)
+
+While Aura’s core does not natively integrate Crashlytics for frontend JavaScript error reporting, you can enhance visibility by integrating this Firebase feature into your Aura build for advanced crash reporting and alerts.
+
+---
+
+## Monitoring User Behavior in Real-Time
+
+Firebase Analytics provides comprehensive real-time user insights. Focus on these key dashboards:
+
+- **User Engagement**: Understand how users interact with Aura, the pages they visit, and their session times.
+- **Geo Distribution**: Track where your users are coming from to optimize regional content and support.
+- **Device Breakdown**: See device types and browsers primarily used, helping you troubleshoot device-specific issues.
+
+---
+
+## Troubleshooting Runtime Issues with Logs
+
+Encountering errors when users navigate your Aura app? Follow this practical approach:
+
+1. **Reproduce Errors Locally**: Use the browser console to capture JavaScript errors and warnings.
+2. **Check Firebase Hosting Logs**: Review recent error entries related to Firebase Hosting for environmental or configuration-related problems.
+3. **Audit Network Requests**: In browser dev tools, track failed network calls or slow response times that impact UX.
+4. **Use Debugging Extensions**: Utilize browser extensions such as [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview) to track events and logs live.
+
+---
+
+## Recommended Tools and Extensions
+
+Equip yourself with these tools for efficient monitoring and logging:
+
+- **Chrome DevTools**: For real-time inspection of network, console logs, and performance profiling.
+- **Firebase Console DebugView**: Monitor analytics events and logs during development and production.
+- **Google Cloud Logging**: Access server-side logs for Firebase Hosting in the Cloud project for deeper error insights.
+
+<Tip>
+Regularly monitor these tools during early deployment phases to catch rare edge-case issues before they impact broad user bases.
+</Tip>
+
+---
+
+## Best Practices for Sustained Visibility
+
+- **Deploy with Source Maps Disabled:** Aura’s production build disables source maps (`productionSourceMap: false`) for security and performance; however, keep local source maps for debugging.
+- **Ensure Consistent Environment Configuration:** Match Firebase project configurations (from `.firebaserc` and `firebase.json`) to avoid misrouted logs or analytics.
+- **Utilize Service Worker Logs:** Aura’s service worker logs update and caching states; monitor these to understand offline mode behavior.
+- **Set Alerts in Firebase/Google Cloud:** Configure alerting policies on error rates or latency spikes to receive notifications proactively.
+
+---
+
+## Monitoring Workflow: From Detection to Resolution
+
+<Steps>
+<Step title="Detect Issues Using Firebase Analytics and Hosting Logs">
+Use Firebase Analytics dashboards and Google Cloud Logging to identify anomalies such as spike in page load errors or latency.
+</Step>
+<Step title="Diagnose via Browser Debugging Tools">
+Inspect failed requests, console errors, and performance bottlenecks using Chrome DevTools.
+</Step>
+<Step title="Correlate Errors with Deployment Configuration">
+Verify `firebase.json`, `vue.config.js`, and Firebase project settings match and have no misconfigurations causing errors.
+</Step>
+<Step title="Apply Fixes and Redeploy">
+Address the root cause, rebuild the application, and redeploy via Firebase Hosting CLI with validated configurations.
+</Step>
+<Step title="Validate Resolution and Monitor Continuously">
+Post-deployment, verify if the errors persist and continue monitoring user interaction trends and health metrics.
+</Step>
+</Steps>
+
+---
+
+## Troubleshooting Common Monitoring Issues
+
+<AccordionGroup title="Troubleshooting Common Monitoring and Logging Problems">
+<Accordion title="Firebase Analytics Not Showing Data">
+- Verify Google Analytics is properly linked to your Firebase project.
+- Check if tracking scripts are correctly included in your build.
+- Allow up to 24 hours for first-time data to appear in analytics dashboards.
+</Accordion>
+<Accordion title="No Error Logs Found in Firebase Hosting">
+- Confirm that you are checking logs in the correct Firebase project and site.
+- Ensure your deployment uses the most recent build that includes error logging outputs.
+- Use browser console logs as an immediate fallback for frontend errors.
+</Accordion>
+<Accordion title="Service Worker Cache Issues Leading to Stale Content">
+- Clear browser cache manually during development.
+- Monitor updating logs dispatched by the service worker (see `src/registerServiceWorker.js`).
+- Use the `swUpdated` event to prompt users for refreshing.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+Once you have configured monitoring and logging:
+
+- Integrate alerting and automated rollback tooling to enhance operational resilience.
+- Explore Firebase Performance Monitoring to track page responsiveness and app stability.
+- Review the [Service Worker, Offline Mode & App Updates](https://docs.example.com/deployment/operations-monitoring-maintenance/service-worker-pwa-updates) documentation for enhanced visibility into offline usage.
+
+---
+
+For detailed instructions on deploying Aura to Firebase Hosting and preparing your production build, consult [Building the Application](../prod-deployment-workflow/build-process) and [Firebase Hosting & Deployment](../prod-deployment-workflow/firebase-hosting-deploy) guides.
+
+---
