@@ -1,0 +1,147 @@
+---
+title: "Deployment Prerequisites"
+description: "Outlines required accounts, permissions, CLI tools (Firebase CLI, Node, Vue CLI), and initial setup steps needed before production deployment. Ensures users understand the fundamental requirements and that both Aura Main and Aura Admin are synchronized before going live."
+---
+
+# Deployment Prerequisites
+
+Before deploying Aura to production, it’s critical to ensure all foundational elements are in place. This chapter equips you with the essential accounts, permissions, tooling, and initial synchronization steps for a smooth, reliable production deployment. Preparing your environment and verifying both Aura Main and Aura Admin apps work harmoniously on the same Firebase backend will save you from costly misconfigurations and downtime.
+
+---
+
+## 1. Required User Accounts & Permissions
+
+### Firebase Console Access
+
+- You **must have owner or editor access** to a Firebase project intended for Aura deployment.
+- This access allows management of Firestore, Authentication, Hosting, Storage, and Cloud Messaging services required by Aura.
+
+### GitHub / Source Control
+
+- Ensure you have developer access to the Aura and Aura Admin repositories.
+- This enables cloning, updates, and synchronizing changes across both codebases.
+
+<Tip>
+Verify that the Firebase project is shared with all team members who will manage or deploy Aura and Aura Admin to prevent permission-related deployment failures.
+</Tip>
+
+## 2. Essential CLI Tools
+
+Aura requires a set of command-line tools to prepare, build, and deploy successfully:
+
+- **Node.js** (version 14.x or later recommended)
+  - Used for running build tools and dependency management.
+- **Vue CLI** (version 4.x or later)
+  - Required for project scaffolding, local development, and building production assets.
+- **Firebase CLI**
+  - Handles project initialization, authentication, deployment to Firebase Hosting, and Firestore rules management.
+
+### Installation Commands (Example)
+```bash
+npm install -g @vue/cli firebase-tools
+```
+
+<Note>
+Check your Node.js version by running `node -v` and update if necessary to avoid build or runtime issues.
+</Note>
+
+## 3. Initial Setup Steps
+
+### Syncing Firebase Configuration
+
+1. **Use the Same Firebase Project for Aura Main and Aura Admin**
+   - Both repositories must point to the identical Firebase project.
+   - This ensures real-time data sync between the Admin panel and the public-facing Aura site.
+
+2. **Update Firebase Keys in `src/config/firebase.js`**
+   - Replace placeholder config values with your Firebase project’s credentials.
+   - This links the app to the correct backend services.
+
+3. **Verify Firestore and Storage Security Rules**
+   - Confirm rules are set to permit authorized access for both apps.
+
+### Local Validation
+
+- Run Aura locally with `npm run serve` after installation.
+- Confirm that:
+  - The application loads without errors.
+  - Data from Firebase appears correctly.
+  - The service worker is registered for offline support.
+
+### Administrative Setup
+
+- Set up Aura Admin with the same Firebase project.
+- Verify that changes made in Aura Admin reflect accurately in the Aura Main app.
+
+## 4. Environment Considerations
+
+### Supported Platforms
+
+- Aura development and deployment workflows are compatible with Windows, macOS, and Linux operating systems with stable Node.js and npm installations.
+
+### Network & Firewall
+
+- Open ports for Firebase CLI operations (primarily HTTPS access to Firebase endpoints).
+- No special inbound firewall rules are needed for hosting as Firebase hosts the app.
+
+### Hardware Recommendations
+
+- A development machine with at least 4GB RAM and stable internet access ensures efficient build times and deployment.
+
+## 5. Synchronizing Aura Main and Aura Admin Before Production
+
+Being aligned on the Firebase backend is non-negotiable for a consistent user experience.
+
+### Checklist Before Going Live
+
+- Both Aura Main and Aura Admin repositories are:
+  - Forked/cloned.
+  - Configured with the same Firebase project.
+  - Tested locally with successful data sync.
+- Firebase project is initialized for Hosting, Firestore, Authentication, Storage, and Messaging.
+- API keys and project identifiers are identical across both codebases.
+
+<Tip>
+Regularly update both repositories from upstream sources to incorporate critical bug fixes and improvements before production deployment.
+</Tip>
+
+## 6. Common Pitfalls to Avoid
+
+- **Mismatched Firebase projects between Aura Main and Aura Admin:** Leads to data inconsistency and failures in reflecting content updates.
+- **Insufficient Firebase permissions:** Can cause deployment or runtime errors related to authentication or storage access.
+- **Outdated CLI tools:** Old versions of Node.js, Firebase CLI, or Vue CLI can cause build failures or unexpected behavior.
+- **Ignoring local validation:** Deploying without confirming local functionality often leads to production downtime.
+
+## 7. Summary of Pre-Deployment Steps
+
+| Step                             | Outcome                                        |
+|---------------------------------|------------------------------------------------|
+| Confirm Firebase project access | Authorized to manage all required Firebase features |
+| Install Node.js, Vue CLI, Firebase CLI | Required tools ready for development and deployment |
+| Sync Firebase config in both repos | Aura Main and Admin connected to same backend |
+| Run local validations            | Verify UI loads, data fetches, and offline caching |
+| Verify Firestore and Storage rules | Secure yet functional data access configured | 
+
+## 8. Next Steps
+
+Once these prerequisites are satisfied, proceed to the [Production Build & Deploy](../production-build-deploy) guide to build your optimized Aura web app and deploy it securely on Firebase Hosting.
+
+---
+
+## Additional Resources
+
+- [System Requirements & Prerequisites](../../getting-started/setup-prerequisites/prerequisites) — For detailed environment and software prerequisites.
+- [Configuring Firebase Integration](../../getting-started/install-configure/firebase-setup) — Step-by-step Firebase project configuration.
+- [Setting up Aura Admin](../../getting-started/setup-prerequisites/aura-admin-note) — Guidance on preparing the administrative interface in tandem.
+
+<AccordionGroup title="Troubleshooting Common Prerequisite Issues">
+<Accordion title="Firebase Permission Errors">
+If you encounter permission denied errors during deployment or Firestore access, verify your Firebase Console user roles. You need at least Editor permissions to deploy and manage backend data.
+</Accordion>
+<Accordion title="CLI Tool Installation Problems">
+Ensure your npm registry is accessible and has no proxy issues. Confirm your PATH includes global npm binaries so commands like `vue`, `firebase` run correctly.
+</Accordion>
+<Accordion title="Local Development Sync Issues">
+If local data does not reflect changes made in Aura Admin, double-check Firebase project configuration files in both repositories for exact matching values.
+</Accordion>
+</AccordionGroup>
