@@ -1,0 +1,181 @@
+---
+title: "Running Aura Locally & Quick Validation"
+description: "Explains how to launch the app locally, what first-time users should expect, and quick checks to confirm setup success or identify issues at a glance."
+---
+
+# Running Aura Locally & Quick Validation
+
+This guide helps you launch the Aura web app locally for development and quickly verify that your setup is correct. It walks you through starting the local server, what the app should look like when opened for the first time, and practical checks to confirm everything is working or spot early issues.
+
+---
+
+## 1. Launching Aura Locally
+
+Follow these steps to run Aura on your development machine:
+
+### Prerequisites
+- Ensure you have completed repository cloning and installed all dependencies (`npm install`).
+- Confirm that your Firebase project configuration is properly applied in `src/config/firebase.js`.
+- Node.js and Vue CLI must be installed and match supported versions.
+
+### Step-by-Step: Start Development Server
+
+1. Open a terminal or command prompt in the root directory of your cloned Aura project.
+2. Run the following command to start the local dev server:
+
+   ```bash
+   npm run serve
+   ```
+
+3. Wait until the compilation completes and the terminal outputs the local URL (typically `http://localhost:8080`).
+4. Open this URL in your web browser.
+
+<Tip>
+If your terminal shows compilation errors or the server doesn't start, check for missing dependencies or Firebase config issues before proceeding.
+</Tip>
+
+---
+
+## 2. What to Expect on First Load
+
+Upon loading locally for the first time, the Aura application performs essential data fetches from Firebase Firestore collections: configuration, teams, events, and speaker directories.
+
+### Initial UI State
+- **Loading Indicator:** A centered spinner appears while fetching configuration and app data.
+- **No Data Message:** If configuration fails or collections are empty, you will see a message:
+  
+  > "Either Your Internet is not Working or Site is not Configured"
+
+- **Successful Load:** When config and data are loaded, you will see the homepage with navigation menus and content.
+
+### Important UI Elements
+- **Toolbar and Drawer:** The top toolbar and left navigation drawer provide access to key pages like Home, Events, Team, and Speakers.
+- **Bottom Navigation:** For smaller screens, bottom nav is visible to ease mobile navigation.
+- **Snackbars:** If a new service worker update is available, a notification prompts you to refresh the app.
+
+---
+
+## 3. Quick Validation Checks
+
+Confirm your setup with these simple tests:
+
+### Verify Configuration Loading
+
+1. When the app loads, watch for the loading spinner to disappear without error messages.
+2. Confirm that the main page navigation (header menus, drawer, bottom nav) appears.
+3. Navigate to the **Events** page to see if upcoming and past events are listed.
+4. Check the **Team** and **Speakers** pages to verify their directories load data correctly.
+
+### Connectivity Verification
+
+- Ensure your development machine has active internet access since Firebase Firestore uses live queries.
+- If offline, the app will indicate no data; check connectivity or Firebase configuration.
+
+### Console Inspection
+
+Open the browser developer console:
+- Look for any errors related to Firebase initialization or data fetching.
+- Watch for logs relating to the service worker registration events (`App is being served from cache...`, `New content is available...`).
+
+<Tip>
+Use the Vue DevTools browser extension to inspect Vuex state for loaded configurations under `config.generalConfig`, `config.keysandsecurity`, and `config.footerConfig`.
+</Tip>
+
+---
+
+## 4. Common Early Issues & Troubleshooting
+
+### Error: "Either Your Internet is not Working or Site is not Configured"
+- **Cause:** The app failed to fetch critical configuration data from Firestore.
+- **Steps to Fix:**
+  - Verify your Firebase project configuration keys in `src/config/firebase.js`.
+  - Ensure Firestore rules allow read access for your user or environment.
+  - Check if Firestore collections `config`, `events`, `team`, and relevant docs exist.
+
+### Loading Spinner Never Disappears
+- **Cause:** The app is unable to complete data fetch or stuck on loading.
+- **Steps to Fix:**
+  - Confirm no network restrictions or firewall blocking Firebase Firestore.
+  - Check terminal for Vue build errors.
+  - Restart the server and browser.
+
+### Service Worker Not Updating
+- If you see the snackbar prompting for refresh, click 'Refresh' to load the latest app version.
+- If updates do not appear, clear browser cache or unregister service worker in browser devtools.
+
+---
+
+## 5. Understanding the Data Flow at Launch
+
+Aura fetches data from Firestore collections via dedicated services. These include:
+
+- General configuration (`config/general`)
+- Keys and security configurations (`config/keysandsecurity`)
+- Footer and branding data (`config/footer`)
+- Teams (`team` collection)
+- Events (`events` collection)
+- Speakers (`Speakers` collection)
+
+The app will only fully display content after these configurations and data sets are loaded successfully.
+
+---
+
+## 6. Next Steps After Successful Local Run
+
+- Explore the [Initial Configuration and Theme Setup](../initial-configuration-and-theme-setup) guide to customize branding and theme.
+- Run the [Validating Your Setup](../troubleshooting-validation/first-validation) guide to perform sanity checks on your data.
+- Consult the [Running Aura Locally](../configuration-run/local-run) documentation for details on UI feedback and service worker behaviors.
+- When ready, prepare for [Production Build & Deploy](../../deployment/deployment-essentials/production-build) to publish your app.
+
+<Check>This local launch and quick validation guide is a critical step for confirming that your Aura environment is correctly connected to Firebase and data is flowing properly before proceeding to deployment or advanced customization.</Check>
+
+---
+
+For detailed troubleshooting, see [Troubleshooting Setup & Common Issues](../run-validate-deploy/setup-troubleshooting).
+
+
+---
+
+## Summary
+This guide equips you to run the Aura application locally, understand initial UI states on first load, perform quick validation checks to ensure data connectivity and configuration, and resolve common startup issues. It sets the foundation for building and customizing your Aura-based community app with confidence.
+
+---
+
+## Additional References
+- [Configuring Firebase Integration](../install-configure/firebase-setup)
+- [Initial Configuration and Theme Setup](../getting-started-workflows/initial-configuration-and-theme-setup)
+- [Running Aura Locally](../configuration-run/local-run)
+- [Troubleshooting Setup & Common Issues](../troubleshooting-validation/common-issues)
+- [Production Build & Deploy](../../deployment/deployment-essentials/production-build)
+
+
+---
+
+## Example Common Terminal Output
+```bash
+  App running at:
+  - Local:   http://localhost:8080/
+  - Network: http://192.168.1.10:8080/
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+```
+
+## Example Browser Console Logs on Successful Start
+```
+App is being served from cache by a service worker.
+Service worker has been registered.
+New content is available; please refresh.
+No internet connection found. App is running in offline mode.
+```
+
+
+---
+
+<Tip>
+Keep your Firebase project configuration synchronized between Aura and Aura Admin apps for smooth local development and data continuity.
+</Tip>
+
+<Tip>
+Regularly update dependencies and Vue CLI to avoid compatibility issues when running locally.
+</Tip>
