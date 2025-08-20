@@ -1,0 +1,221 @@
+---
+title: "Advanced Branding and Theme Customization"
+description: "How to tailor Aura’s appearance to match your community identity: adjust theme colors, logo, and layout for maximum visual impact—while protecting accessibility and usability."
+---
+
+# Advanced Branding and Theme Customization
+
+Customize Aura’s look and feel to perfectly represent your community’s unique identity. This guide walks you through adjusting theme colors, updating your logo, and tailoring layout elements — all while ensuring your site remains accessible and easy to use.
+
+---
+
+## 1. Workflow Overview
+
+### What You Will Achieve
+By following this guide, you will learn how to:
+- Change primary theme colors to match your branding palette.
+- Update your community logo that appears on the toolbar and key navigation areas.
+- Customize layout elements and component visibility to maximize visual impact.
+- Maintain usability and accessibility standards so all users enjoy a consistent experience.
+
+### Prerequisites
+Ensure you have:
+- Administrative access to your Aura application’s configuration.
+- Completed initial setup and basic theme configuration as outlined in [Initial Configuration & Theme Setup](../getting-started-workflows/initial-configuration-and-theme-setup).
+- Familiarity with accessing configuration via Aura Admin or JSON files.
+
+### Expected Outcome
+Your Aura web application will exhibit a distinct branded appearance consistent with your community’s identity, enhancing recognition and engagement.
+
+### Estimated Time
+15-30 minutes depending on the extent of customization.
+
+### Difficulty Level
+Intermediate — requires navigating configuration files or the admin interface.
+
+---
+
+## 2. Step-by-Step Instructions
+
+### Step 1: Update Theme Colors
+Aura uses Vuetify’s theming system allowing you to adjust colors globally.
+
+1. Open the `src/plugins/vuetify.js` file in your Aura source code.
+2. Locate the `theme` object defining `light` and `dark` color palettes.
+3. Modify the `primary`, `secondary`, and `accent` colors to your brand’s color codes.
+
+Example:
+```javascript
+import colors from 'vuetify/lib/util/colors'
+
+export default new Vuetify({
+  theme: {
+    themes: {
+      light: {
+        primary: colors.deepPurple.accent4,  // change from colors.blue
+        secondary: colors.amber.darken2,     // your secondary color
+        accent: colors.blueGrey.darken3       
+      },
+      dark: {
+        primary: colors.deepPurple.accent4
+      }
+    },
+  },
+});
+```
+
+4. Save the file and rebuild your project (`npm run build` or `npm run serve` for local).
+
+**Success Criteria:** The app’s primary UI elements reflect your new color scheme in both light and dark modes.
+
+---
+
+### Step 2: Change the Community Logo
+Your logo appears primarily in the Toolbar component and other navigation headers.
+
+1. Prepare a logo image optimized for web (SVG, PNG with transparent background recommended).
+2. Upload your logo to your hosting or include it in the Aura Admin configuration under `generalConfig.toolbarImage`.
+3. In Aura Main, the logo path is referenced dynamically. To update it manually:
+    - Access your configuration store or the database where `generalConfig.toolbarImage` is set.
+    - Update the URL to point to your new logo.
+
+If using Aura Admin:
+- Navigate to the Branding section.
+- Upload or set the new logo URL for the Toolbar image.
+
+4. Refresh the Aura app to see the updated logo.
+
+**Success Criteria:** The Toolbar and header display your updated logo clearly.
+
+<Tip>
+Make sure your logo dimensions align well with the toolbar space to avoid layout issues. A width around 25px is used in Aura for the toolbar logo.
+</Tip>
+
+---
+
+### Step 3: Customize Layout and Visibility
+Aura offers predefined components such as Toolbar, Drawer, Bottom Navigation, and Footer, each playing a role in your site’s UI.
+
+1. Review the Toolbar links from the `src/store/index.js` under `state.items`. These determine what navigation tabs are visible.
+
+2. To show or hide links in the Toolbar:
+   - Adjust the `meta.showToolbar` flag for each item.
+
+Example:
+```js
+{ text: 'Partners', to: '/partners', icon: 'mdi-currency-usd', meta: { showToolbar: false, showBottomNav: false } }
+```
+Setting `showToolbar` to false hides that item in the top navigation.
+
+3. Layout Component Order:
+   - Aura automatically hides elements like Bottom Navigation or Drawer based on route context (e.g., event pages).
+   - You can further modify visibility logic in components like `src/App.vue` where conditions govern rendering.
+
+4. To fine-tune look and spacing, modify CSS classes in your component files, respecting Vuetify’s theming and responsiveness.
+
+**Success Criteria:** The navigation and page layout reflect your preferred content visibility and arrangement.
+
+---
+
+### Step 4: Protect Accessibility and Usability
+Brand customization must not degrade accessibility or user experience.
+
+- Maintain sufficient contrast when choosing theme colors. Use tools like [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/).
+- Use recognizable icons and labels in navigation for all users.
+- Ensure keyboard navigation and focus states remain visible.
+- Validate responsive behavior across devices (mobile, tablet, desktop).
+
+**Best Practice:** Test any branding changes using accessibility evaluation tools and real user feedback.
+
+---
+
+## 3. Practical Examples
+
+### Example Configuration Snippet for Vuetify Theme
+```javascript
+import colors from 'vuetify/lib/util/colors'
+
+export default new Vuetify({
+  theme: {
+    themes: {
+      light: {
+        primary: '#1a237e', // your brand primary color
+        secondary: '#ff6f00',
+        accent: '#00bcd4',
+        error: '#f44336'
+      },
+      dark: {
+        primary: '#1a237e'
+      }
+    },
+  },
+});
+```
+
+### Example JSON Fragment for Toolbar Logo URL
+```json
+{
+  "generalConfig": {
+    "toolbarImage": "https://yourcdn.com/images/logo.svg",
+    "name": "Your Community",
+    "shortName": "YC"
+  }
+}
+```
+
+### Adjusting Navigation Links
+```js
+state.items = [
+  ...
+  { text: 'Blogs', to: '/blogs', meta: { showToolbar: true, showBottomNav: false } },
+  { text: 'Partners', to: '/partners', meta: { showToolbar: false, showBottomNav: false } },
+  ...
+]
+```
+
+---
+
+## 4. Troubleshooting & Tips
+
+<AccordionGroup title="Troubleshooting Common Issues">
+<Accordion title="Theme Colors Not Updating After Changes">
+- **Cause:** Browser cache or service worker cache may serve old styles.
+- **Solution:** Clear browser cache, reload the page with Ctrl+Shift+R, or unregister the service worker via dev tools.
+- Also, ensure you rebuilt and redeployed the app after changes.
+</Accordion>
+<Accordion title="Logo Not Displaying">
+- **Cause:** Incorrect image URL or missing permissions.
+- **Solution:** Verify the logo URL is correct and accessible publicly.
+- Confirm the configuration is correctly loaded — check Vuex state `config.generalConfig.toolbarImage`.
+</Accordion>
+<Accordion title="Navigation Items Not Showing or Hidden">
+- **Cause:** `showToolbar` flag set incorrectly.
+- **Solution:** Confirm these flags in your config store match your intended visibility.
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Use Vuetify's theme dark and light mode toggling to preview your colors and logos on both modes before finalizing.
+</Tip>
+
+<Tip>
+Maintain logo image size and file format consistent with Aura defaults to avoid distortion.
+</Tip>
+
+---
+
+## 5. Next Steps & Related Content
+
+- For basics of theme and branding setup, review [Initial Configuration & Theme Setup](../getting-started-workflows/initial-configuration-and-theme-setup).
+- Deploy your customized theme confidently following [Deploying Aura to Firebase](../getting-started-workflows/deploying-aura-to-firebase).
+- Learn how to optimize PWA behavior with your theme at [Optimizing PWA and Offline Experience](../advanced-customization-and-optimization/optimizing-pwa-and-offline-support).
+- Troubleshoot common configuration issues via [Troubleshooting Common Issues](../getting-started/troubleshooting-validation/common-issues).
+
+Explore these guides to deepen your Aura customization mastery and provide your community with an engaging, cohesive branding experience.
+
+---
+
+## Summary
+Customizing Aura’s appearance strengthens your community’s identity and user engagement. With this guide, you can tailor theme colors, update logos, and refine layout visibility while safeguarding accessibility and usability. Follow the structured workflow for efficient, confident branding changes that make your Aura site truly yours.
+
+---
