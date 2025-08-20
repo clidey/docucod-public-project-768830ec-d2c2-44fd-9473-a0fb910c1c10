@@ -1,0 +1,215 @@
+---
+title: "Cloning and Installing Aura"
+description: "Step-by-step guide to forking and cloning both the Aura and Aura Admin repositories, installing dependencies, and readying the environment using recommended tools."
+---
+
+# Cloning and Installing Aura
+
+This guide will walk you through the essential steps for forking, cloning, and installing the Aura and Aura Admin repositories. It also covers preparing your development environment with recommended tools so you can get started quickly and reliably.
+
+---
+
+## 1. Prerequisites & Setup
+
+Before starting with cloning and installation, ensure your system meets the following requirements:
+
+- **Node.js**: Install Node.js version between v8.9.4 and v12.13.0. You can download it from [https://nodejs.org/en/download/](https://nodejs.org/en/download/).
+- **Vue CLI**: Install Vue CLI globally using the command below:
+
+```bash
+npm install -g @vue/cli
+```
+
+- **Git**: Make sure Git is installed for cloning repositories.
+- **Firebase Account**: Sign up for a Firebase account at [Firebase Console](https://console.firebase.google.com) and create a project to be used by both Aura and Aura Admin.
+
+<Tip>
+Using compatible Node.js versions is critical. Versions outside the specified range may cause dependency or build failures.
+</Tip>
+
+---
+
+## 2. Forking and Cloning the Repositories
+
+Aura requires two linked repositories: Aura Main (the public-facing web app) and Aura Admin (the management console). Both must be forked and cloned.
+
+### Step 1: Fork the repositories
+
+- Go to the Aura Main repository: [https://github.com/gdg-x/aura](https://github.com/gdg-x/aura) and click the Fork button.
+- Similarly, fork Aura Admin repository here: [https://github.com/gdg-x/aura-admin](https://github.com/gdg-x/aura-admin).
+
+### Step 2: Clone the repositories locally
+
+Clone both repositories to your local development machine using Git commands:
+
+```bash
+git clone https://github.com/<your-username>/aura.git
+
+git clone https://github.com/<your-username>/aura-admin.git
+```
+
+Make sure to replace `<your-username>` with your GitHub username.
+
+<Warning>
+Use the **same Firebase project** for both Aura Main and Aura Admin to ensure real-time syncing and proper integration.
+</Warning>
+
+---
+
+## 3. Configuring Firebase Project
+
+### Step 1: Create a Firebase Web App
+
+- Open your Firebase project in the Firebase Console.
+- Navigate to Project Settings → General tab.
+- Scroll to **Your apps** section and click **Add app** (web icon).
+- Register the app and copy the Firebase configuration snippet.
+
+```js
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+projectId: "YOUR_PROJECT",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "SENDER_ID",
+appId: "APP_ID"
+```
+
+### Step 2: Update Aura Main Firebase Configuration
+
+- Open `src/config/firebase.js` inside your Aura Main cloned repository.
+- Replace the sample config with your Firebase project config copied in Step 1.
+
+---
+
+## 4. Installing Dependencies
+
+Navigate into the Aura Main repository folder and install all dependencies using npm:
+
+```bash
+cd aura
+npm install
+```
+
+This will install Vue, Vuex, Vuetify, Firebase SDK, and other required libraries.
+
+Repeat the dependency installation inside the Aura Admin folder if you are also setting up the Admin app.
+
+<Note>
+If any errors occur during `npm install`, verify your Node.js version and clear npm cache if needed (`npm cache clean --force`).
+</Note>
+
+---
+
+## 5. Verifying Your Setup
+
+### Step 1: Run Aura Locally
+
+Start the development server with:
+
+```bash
+npm run serve
+```
+
+Open your browser at the local URL displayed (commonly http://localhost:8080).
+
+### Step 2: Initial UI Check
+
+- On first run, if the app shows a message like "Either Your Internet is not Working or Site is not Configured", this is expected before configuration loads completely.
+- Confirm the app starts without build errors or crashes.
+
+---
+
+## 6. Next Steps
+
+- Follow the **Configuring Firebase Integration** guide to complete Firebase Firestore rules and authentication setup.
+- Proceed to **Project & Environment Configuration** to set environment variables and customize app settings.
+- Consult the **Running Aura Locally & Quick Validation** page to understand how to validate your local installation.
+
+---
+
+## Troubleshooting Common Issues
+
+<AccordionGroup title="Common Installation & Cloning Issues">
+<Accordion title="npm install errors">
+Check Node.js version compatibility, run `npm cache clean --force`, delete `node_modules` directory and retry install.
+</Accordion>
+<Accordion title="Firebase Config Mismatch">
+Ensure the Firebase config in `src/config/firebase.js` exactly matches your Firebase Web App settings.
+</Accordion>
+<Accordion title="Git Clone Authentication Problems">
+Make sure you have set up SSH keys or use HTTPS and provide correct GitHub credentials.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Summary
+By completing these steps, you will have the Aura Main and Aura Admin repositories cloned, environment prepared, dependencies installed, and the Firebase project integrated with your local codebase – providing a stable foundation for further development and deployment.
+
+---
+
+For in-depth guides on Firebase security, running the app locally, and full deployment instructions, please refer to the related documentation listed below.
+
+---
+
+## Helpful Links
+
+- [Aura Admin Setup](https://github.com/gdg-x/aura-admin/blob/main/README.md)
+- [Configuring Firebase Integration](../install-configure/firebase-setup)
+- [Running Aura Locally & Quick Validation](../run-validate-deploy/local-run-validation)
+- [Deployment & Hosting on Firebase](../run-validate-deploy/firebase-deployment)
+- [Troubleshooting Common Issues](../run-validate-deploy/setup-troubleshooting)
+
+---
+
+## Contribution & Support
+
+If you encounter challenges or have questions, raise issues on our GitHub repository:
+- [Aura Issues](https://github.com/gdg-x/aura/issues)
+- [Aura Admin Issues](https://github.com/gdg-x/aura-admin/issues)
+
+Our team actively supports users and typically responds within 12 hours.
+
+---
+
+Thank you for choosing Aura to empower your tech community!
+
+---
+
+<Check>
+Ensure you have forked and cloned both Aura and Aura Admin repositories.
+Use the same Firebase project setup for both apps.
+Verify Node.js and Vue CLI versions before installing dependencies.
+</Check>
+
+---
+
+### Code Snippet: Cloning Aura Repositories
+```bash
+git clone https://github.com/<your-username>/aura.git
+
+git clone https://github.com/<your-username>/aura-admin.git
+```
+
+### Code Snippet: Installing Dependencies
+```bash
+cd aura
+npm install
+```
+
+### Code Snippet: Running Locally
+```bash
+npm run serve
+```
+
+---
+
+### Configuration Location to Update Firebase
+
+- File: `src/config/firebase.js`
+- Replace firebaseConfig object values with your project's SDK snippet.
+
+---
+
+_This guide focuses solely on cloning and installation steps. For configuration, environment setup, and running the app, see linked guides in Helpful Links._

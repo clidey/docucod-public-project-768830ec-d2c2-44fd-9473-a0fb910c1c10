@@ -1,0 +1,188 @@
+---
+title: "Troubleshooting Setup & Common Issues"
+description: "A short, targeted page on resolving frequent installation and first-run problems, such as environment mismatches or configuration errors. Empowers users to solve problems without extensive support searches."
+---
+
+# Troubleshooting Setup & Common Issues
+
+Welcome to the troubleshooting guide for Aura's setup and initial launch. This page empowers you to quickly identify and resolve frequent installation and first-run problems — whether you're facing environment mismatches, configuration errors, or unexpected app behavior — without spending excessive time navigating support channels.
+
+---
+
+## 1. Common Installation & Environment Issues
+
+### 1.1 Firebase Configuration Mismatches
+
+- **Symptom:** App fails to load or shows "no data" with messages like _"Site is not Configured"_ on launch.
+- **Cause:** Your Firebase project details (API keys, project ID, auth domain, etc.) in `src/config/firebase.js` do not match the project set up on Firebase Console or are incomplete.
+
+**Action Steps:**
+1. Verify you have copied the Firebase config exactly from your Firebase Console:
+   - Check apiKey, authDomain, projectId, storageBucket, messagingSenderId, and appId.
+2. Confirm your Firebase project and Aura Admin use the same Firebase configuration for syncing data.
+3. Ensure Firestore database rules allow the app to read required collections.
+
+<Note>
+Always keep the Firebase config synchronized between Aura and Aura Admin repositories to avoid data access failures.
+</Note>
+
+### 1.2 Node.js and Dependency Installation Issues
+
+- **Symptom:** Errors during `npm install` or `npm run serve` such as module not found, or incompatible versions.
+- **Cause:** Using unsupported Node.js versions or outdated package manager.
+
+**Action Steps:**
+1. Aura requires Node.js (version 14 or later recommended).
+2. Check your Node and npm versions:
+
+```bash
+node -v
+npm -v
+```
+
+3. If incompatible, install the recommended Node.js version from [nodejs.org](https://nodejs.org/).
+4. Delete `node_modules` and run `npm install` again.
+
+### 1.3 Service Worker & PWA Errors
+
+- **Symptom:** App does not refresh new updates or shows offline issues unexpectedly.
+- **Cause:** Problems with service worker registration or caching strategy.
+
+**Action Steps:**
+1. Check browser console logs for service worker errors.
+2. Try clearing cache and unregistering service workers manually:
+
+```
+In Chrome DevTools > Application > Service Workers, unregister existing workers.
+```
+
+3. Restart your dev server and reload the app.
+4. See the [Optimizing PWA & Offline Support](../../guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support) guide for advanced troubleshooting.
+
+---
+
+## 2. First-Run Configuration Errors
+
+### 2.1 Missing or Empty Configuration Data
+
+- **Symptom:** App shows loading spinner indefinitely or "No Data" messages after launch.
+- **Cause:** The app’s Vuex store is unable to fetch general, security key, or footer configuration from Firestore.
+
+**Action Steps:**
+1. Open Firestore and check the `config` collection:
+   - Documents like `general`, `footer`, and `keysandsecurity` should exist and have non-empty data.
+2. Confirm that `src/services/appservices.js` can fetch this data without errors.
+3. Inspect network tab during app load to verify Firebase reads succeed.
+4. If data is missing, apply initial configuration settings or re-import them from Aura Admin.
+
+<Warning>
+Without proper config data, Aura cannot correctly populate theme, keys, or footer, causing UI failure.
+</Warning>
+
+### 2.2 Vuex Store Not Updating or Missing Data
+
+- **Symptom:** UI components like events, team, or speakers remain blank.
+- **Cause:** Either config data is missing or Vuex mutations are not committed correctly in `src/App.vue`.
+
+**Action Steps:**
+1. Verify in `src/App.vue` that `getData()` successfully retrieves data and commits mutations.
+2. Confirm Firestore permissions and network connectivity.
+3. Review console logs for errors or warnings during data fetch.
+
+---
+
+## 3. Troubleshooting Common UI & Data Fetching Issues
+
+### 3.1 Events or Teams Not Displaying
+
+- **Symptom:** Event lists or team directories are empty or show error messages.
+
+**Action Steps:**
+1. Ensure Firestore collections `events` and `team` contain documents.
+2. Confirm visibility flags (e.g., `visible` set to `true`) for events.
+3. In components like `src/components/events/PastEvents.vue` and `src/components/events/UpcomingEvents.vue`, check if API calls succeed:
+
+```js
+service.getAllEvents()
+service.getAllMeetupPastEvents()
+```
+
+4. Check for any error snackbars or messages that indicate fetch failures.
+
+### 3.2 API Errors and Network Failures
+
+- **Symptom:** Snackbars show messages like _"Issue found with <error>"_.
+
+**Action Steps:**
+1. Verify your internet connectivity.
+2. Confirm your Firebase project is active and properly configured.
+3. For calls to external APIs (e.g., Meetup API proxied via CORS), ensure the proxy service (like cors-anywhere) is operational or replace it with your own proxy.
+4. Check browser console for detailed error traces.
+
+---
+
+## 4. Step-By-Step Quick Troubleshooting Flow
+
+Follow this checklist to efficiently identify setup problems:
+
+<Steps>
+<Step title="Check Firebase Configuration">
+Open `src/config/firebase.js` and verify your Firebase keys are correct and correspond to your Firebase Console.
+</Step>
+<Step title="Verify Firestore Data">
+Log into your Firebase Console Firestore and ensure key collections and documents exist (`config/general`, `team`, `events`).
+</Step>
+<Step title="Run App with Logs">
+Start the app with `npm run serve` and monitor terminal and browser console for warnings or errors.
+</Step>
+<Step title="Clear Cache & Service Workers">
+Clear browser cache and unregister old service workers to avoid stale data or installation conflicts.
+</Step>
+<Step title="Check Network Connections">
+Ensure you have active internet access, and there are no firewall rules blocking Firebase or external APIs.
+</Step>
+</Steps>
+
+---
+
+## 5. Troubleshooting Tips & Best Practices
+
+- **Match Config Across Repositories:** Aura Main and Aura Admin must share the same Firebase project configuration to synchronize data and avoid runtime fetch issues.
+- **Test with Minimal Data:** Begin with a handful of test events and team members to isolate data fetch problems.
+- **Monitor Logs:** Browser console and terminal logs are your first sources of truth. Investigate warnings or stack traces promptly.
+- **Validate Firestore Rules:** Incorrect security rules can silently block data reads.
+- **Update Dependencies:** Regularly update npm packages and dependencies to keep compatibility with Firebase SDKs.
+
+<Tip>
+Using the development server logs and browser DevTools network inspector will drastically reduce your troubleshooting time.
+</Tip>
+
+---
+
+## 6. Where to Get Help
+
+- Consult the [Common Issues Troubleshooting Guide](./common-issues) for detailed remediation strategies.
+- Review the [Firebase Setup](../../getting-started/install-configure/firebase-setup) documentation to confirm your integration.
+- Engage in the Aura community or open issues on the [GitHub repository](https://github.com/gdg-x/aura).
+- Refer to related guides for deployment, configuration, and optimization linked below.
+
+---
+
+## Related Documentation
+
+- [System Requirements & Prerequisites](/getting-started/setup-prerequisites/prerequisites)
+- [Cloning and Installing Aura](/getting-started/install-configure/repo-installation)
+- [Configuring Firebase Integration](/getting-started/install-configure/firebase-setup)
+- [Running Aura Locally & Quick Validation](/getting-started/run-validate-deploy/local-run-validation)
+- [Common Issues Troubleshooting](/getting-started/run-validate-deploy/common-issues)
+- [Optimizing PWA & Offline Support](/guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support)
+- [Deploying to Firebase Hosting](/getting-started/run-validate-deploy/firebase-deployment)
+
+---
+
+This Troubleshooting Setup & Common Issues guide forms your first line of defense in ensuring Aura is correctly installed, configured, and ready to serve your tech community with rich event and team management features.
+
+
+---
+
+<Source url="https://github.com/gdg-x/aura" branch="main" paths={[{"path": "src/config/firebase.js", "range": "1-28"},{"path": "src/App.vue", "range": "1-112"},{"path": "src/services/appservices.js", "range": "1-154"}]} />

@@ -1,0 +1,193 @@
+---
+title: "Showcasing Teams and Speaker Profiles"
+description: "Guide to maintaining vibrant team and speaker directories, enabling self-branding and public discovery. Learn to manage core/organizing/volunteer teams, add speaker data, and utilize public URLs for social promotion."
+---
+
+# Showcasing Teams and Speaker Profiles
+
+## Overview
+This guide empowers you to build, maintain, and promote dynamic team and speaker directories within your Aura-powered community web application. By following this workflow, you will enable your community to self-brand, allow easy public discovery through rich profiles, and leverage content sharing through public URLs.
+
+Maintaining up-to-date and engaging team and speaker profiles helps build community identity and trust, enhances event visibility, and facilitates social promotion.
+
+---
+
+## What You Will Achieve
+- Manage multiple team roles such as Core Team, Organizing Team, and Volunteers with flexible visibility controls.
+- Add and update speaker profiles, enriching them with bios, social links, company affiliations, and sessions.
+- Enable public-facing directories and detailed profile views for easy discovery.
+- Use public URLs to share profiles on social media, emails, or embedded links.
+
+## Prerequisites
+- Aura Main app configured and connected to your Firebase backend.
+- Team and Speaker data properly structured and uploaded in Firestore under collections `team` and `Speakers`.
+- Basic familiarity with Aura navigation and project configuration (see Setup and Configuration guides).
+
+---
+
+## 1. Managing Team Profiles
+
+### Understanding Team Roles
+Aura’s team functionality categorizes members into distinct roles:
+- **Core Team:** The principal leadership or founding members.
+- **Organizing Team:** Members actively managing or organizing events.
+- **Volunteers:** Contributors supporting event and community activities.
+
+Each member entry includes attributes like name, designation, social links, bio, profile image, role, and active status.
+
+### Viewing Team Members
+The Teams page automatically separates and lists Core Team and Organizing Team members with dedicated components:
+
+- **Core Team Section:** Displays member cards aligned in a grid.
+- **Organizing Team Section:** Presented as an interactive list for quick navigation.
+
+If no members are found, a user-friendly "Team Not Found" message is displayed.
+
+### Step-by-Step to Manage Teams
+<Steps>
+<Step title="Fetch Team Data">
+Fetch team members from Firestore via the `getTeam()` service method. Filter data by member role and visibility status to organize members into respective sections.
+</Step>
+<Step title="Display Team Members">
+Use the CoreTeam and OrganizingTeam components to visually render members. CoreTeam uses cards, OrganizingTeam uses a list layout with social links and actionable profile navigation.
+</Step>
+<Step title="Navigate to Member Details">
+Enable clicking a team member to navigate to their detailed profile page using dynamic routes such as `/team/:id` where `id` is the member’s Firestore document ID.
+</Step>
+</Steps>
+
+### Tips
+- Keep the `visible` attribute accurate to control public display.
+- Confirm active status to highlight currently engaged members.
+- Provide social media handles for richer profiles and networking.
+
+---
+
+## 2. Adding and Managing Speaker Profiles
+
+### Speaker Directory
+Speakers for events are maintained in a dedicated collection (`Speakers`) and reflect cross-event participation.
+
+Speakers can have detailed profiles including:
+- Name, designation, company, location (city, country)
+- Bio and social media links
+- Profile image
+- List of sessions or events where they present
+
+### Using the Speakers Page
+A speaker lineup page lists all speakers related to a selected event, loading data dynamically and showing a loading indicator while fetching.
+
+### Viewing Speaker Details
+Clicking on a speaker opens a detailed profile page featuring:
+- Speaker portrait and personal details
+- Social media buttons
+- Biography
+- Session list with clickable links to event details
+
+### Step-by-Step Instructions
+<Steps>
+<Step title="Load Speakers List">
+Invoke the `getAllSpeakers()` method to retrieve all speaker profiles and match them with event speaker IDs.
+</Step>
+<Step title="Render Speaker Cards">
+Use the `LayoutSpeaker` component to display speaker thumbnails and basic info in a responsive grid.
+</Step>
+<Step title="Access Speaker Details">
+Implement navigation on speaker cards so users can view full profiles via routes like `/speakers/:id`.
+</Step>
+<Step title="Display Detailed Profile">
+In the speaker detail view, call `getSpeaker(id)` and `getAllEvents()` to fetch biography and sessions. Handle not found cases gracefully with error messaging.
+</Step>
+</Steps>
+
+### Practical Example: Speaker Profile Display
+```vue
+<v-avatar size="100">
+  <v-img
+    :src="speaker.image || fallbackImage"
+    alt="Speaker Image"
+  />
+</v-avatar>
+<p>{{ speaker.name }}</p>
+<p>{{ speaker.designation }} at {{ speaker.company.name }}</p>
+<div v-for="(link, platform) in speaker.socialLinks" :key="platform">
+  <a :href="link" target="_blank">{{ platform }}</a>
+</div>
+```
+
+---
+
+## 3. Utilizing Public URLs for Social Promotion
+
+Each team member and speaker has a dedicated public URL (e.g., `/team/:id` or `/speakers/:id`) that can be shared across social media, newsletters, or embedded links.
+
+### Best Practices
+- Use canonical URLs to improve SEO and shareability.
+- Keep bios concise and visually engaging to encourage social sharing.
+- Update social links regularly to ensure connectivity.
+
+---
+
+## 4. Troubleshooting Common Issues
+
+### Team or Speaker Data Not Displaying
+- Verify that Firestore collections `team` and `Speakers` contain documents with correct and complete data.
+- Confirm `visible` flags are set to `true` for public profiles.
+- Check network connectivity and Firestore permissions.
+
+### "No Speaker Found" or "Team Not Found" Messages
+- These appear if the data fetch returns empty or filtered results yield no visible entries.
+- Validate the IDs referenced in event speaker or team arrays match Firestore document IDs.
+
+### Profile Images Not Loading
+- Ensure images are correctly referenced in Firestore. Use fallback placeholders if images are missing.
+- Confirm image URLs are accessible publicly or properly stored in Firebase Storage with permissions.
+
+<Warning>
+Keep your Firestore security rules updated to allow read access as appropriate while protecting sensitive data.
+</Warning>
+
+---
+
+## 5. Best Practices
+
+- Regularly synchronize team and speaker data between Aura Admin and Aura Main to reflect changes promptly.
+- Use consistent role naming conventions (`Core Team`, `Organizing Team`, `Volunteer`) to prevent filtering errors.
+- Provide clear, engaging bios and social links to maximize profile appeal.
+- Use the active/inactive status to avoid displaying outdated profiles.
+
+---
+
+## 6. Next Steps & Related Guides
+- [Managing Events: From Creation to Promotion](./guides-tab/community-features/managing-events) 
+- [Connecting Aura Admin for Community Management](./guides-tab/getting-started/connecting-aura-admin) 
+- [Deploying Your Community App on Firebase](./guides-tab/getting-started/deploying-on-firebase) 
+- [Troubleshooting Setup & Common Issues](./getting-started/run-validate-deploy/setup-troubleshooting)
+- For advanced branding and theme customization, refer to [Branding and Theme Advanced Customization](./guides/advanced-customization-and-optimization/branding-and-theme-advanced)
+
+---
+
+## Appendix: Quick Reference
+
+### Key Service Methods
+| Method | Description |
+|----------------------|-------------------------------------------|
+| `getTeam()` | Fetches all team members from Firestore |
+| `getTeamMember(id)` | Fetches detailed profile for single team member |
+| `getAllSpeakers()` | Retrieves list of all speakers |
+| `getSpeaker(id)` | Retrieves detailed data for a speaker by ID |
+| `getAllEvents()` | Fetches all events for session matching with speakers |
+
+### Navigation Paths
+| Page | Route Pattern |
+|---------------------|------------------------|
+| Team Listing | `/team` |
+| Team Member Details | `/team/:id` |
+| Speaker Listing | `/speakers` (within event context) |
+| Speaker Details | `/speakers/:id` |
+
+<Tip>
+For a seamless user experience, ensure that all data and visibility settings in Aura Admin align with what Aura Main expects, so directories always reflect current team and speaker information.
+</Tip>
+
+---

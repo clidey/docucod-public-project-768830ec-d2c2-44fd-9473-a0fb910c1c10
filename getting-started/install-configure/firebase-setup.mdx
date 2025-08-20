@@ -1,0 +1,160 @@
+---
+title: "Configuring Firebase Integration"
+description: "Walks through connecting Aura to a custom Firebase project, acquiring configuration keys from the Firebase Console, updating the core config file, and ensuring credentials are securely in place."
+---
+
+# Configuring Firebase Integration
+
+Connecting Aura to your custom Firebase project is a critical step to ensure your community web app functions seamlessly with your own backend data and services. This guide walks you through acquiring the necessary Firebase configuration keys, updating Aura’s core Firebase config file, and securing your credentials properly.
+
+---
+
+## 1. Prerequisites
+
+- You must already have a Firebase project created in the [Firebase Console](https://console.firebase.google.com).
+- Firebase Authentication, Firestore Database, Storage, and Messaging services should be enabled in your Firebase project.
+- Access to the Firebase project settings with sufficient permissions to view configuration details.
+- Aura repositories locally cloned and set up, ready for configuration.
+
+<Check>
+Make sure you have also set up Aura Admin with the **same Firebase project** to maintain consistency across services.
+</Check>
+
+---
+
+## 2. Getting Your Firebase Configuration Keys
+
+1. Navigate to your Firebase project in the Firebase Console.
+2. Click the gear icon ⚙️ near the project name to open **Project Settings**.
+3. Under the **General** tab, locate the section named **Your Apps**.
+4. If you haven't already, add a new web app by clicking the `<></>` icon and giving it a nickname.
+5. Once added, scroll to the **Firebase SDK snippet** section, and select the **Config** option.
+6. Copy the generated configuration object. It looks like this:
+
+    ```js
+    apiKey: "AIzaSyCOl0qzkhCDmyWeeIT8AZe4xyJJlIfU5gE",
+    authDomain: "myaurapp.firebaseapp.com",
+    databaseURL: "https://myaurapp.firebaseio.com",
+    projectId: "myaurapp",
+    storageBucket: "myaurapp.appspot.com",
+    messagingSenderId: "419511997060",
+    appId: "1:419511997060:web:ce7aa0d308f6b484f868d1"
+    ```
+
+<Tip>
+Copy this configuration carefully. These keys connect your Aura app to your Firebase backend and enable all services such as Authentication, Firestore, and Messaging.
+</Tip>
+
+---
+
+## 3. Updating Aura's Firebase Config File
+
+With the config keys ready, update Aura’s core Firebase configuration file.
+
+1. Locate the file at `src/config/firebase.js` in your Aura codebase.
+2. Replace the default `firebaseConfig` object with your copied configuration keys. This will look like:
+
+    ```js
+    const firebaseConfig = {
+      apiKey: "<YOUR_API_KEY>",
+      authDomain: "<YOUR_AUTH_DOMAIN>",
+      databaseURL: "<YOUR_DATABASE_URL>",
+      projectId: "<YOUR_PROJECT_ID>",
+      storageBucket: "<YOUR_STORAGE_BUCKET>",
+      messagingSenderId: "<YOUR_MESSAGING_SENDER_ID>",
+      appId: "<YOUR_APP_ID>"
+    };
+    ```
+
+3. Save the file.
+
+
+---
+
+## 4. Understanding the Firebase Module Initialization
+
+Aura initializes Firebase with your config and enables offline persistence for Firestore. Here is what happens in `firebase.js`:
+
+- Imports Firebase core and required services (auth, firestore, storage, messaging).
+- Calls `firebase.initializeApp(firebaseConfig)` with your config.
+- Enables Firestore offline persistence with tab synchronization.
+- Exports initialized Firebase services for application-wide use.
+
+
+---
+
+## 5. Security Considerations
+
+- Do not expose your Firebase config file publicly or commit it into unprotected repositories.
+- Use environment variables or secured deployment mechanisms to safeguard keys in production if feasible.
+- Keep your Firebase project rules up to date to restrict access as needed.
+
+<Warning>
+Even though Firebase configuration keys are not secret like passwords, exposing them without proper rules makes your backend susceptible to misuse. Always enforce Firestore and Storage security rules.
+</Warning>
+
+---
+
+## 6. Verifying Your Configuration
+
+After updating your Firebase config:
+
+1. Start the Aura app locally using `npm run serve`.
+2. Check the browser console for any Firebase initialization errors.
+3. Navigate through the app’s key sections (Events, Team, Speakers) to confirm data loads as expected.
+4. Confirm Authentication is working by signing in/signing out if enabled.
+
+<Tip>
+If you see messages like 'Your internet is not Working or Site is not Configured' on first run, verify your Firebase config accuracy and internet connectivity.
+</Tip>
+
+---
+
+## 7. Troubleshooting Common Firebase Integration Issues
+
+<AccordionGroup title="Common Issues and Solutions">
+<Accordion title="Firebase Project Not Found or Invalid API Key">
+- Double-check the `apiKey` and `projectId` in your `firebase.js`
+- Verify you are using the same Firebase project for both Aura and Aura Admin
+- Ensure the web app was added in the Firebase Console and config copied properly
+</Accordion>
+
+<Accordion title="Firestore Data Not Loading or Empty">
+- Confirm Firestore has your collections and documents populated
+- Check Firestore security rules allow read access to authenticated users or public as appropriate
+- Review browser console for permission errors
+</Accordion>
+
+<Accordion title="Messaging Service Not Supported">
+- Firebase Messaging requires HTTPS and compatible browsers
+- Confirm `firebase.messaging.isSupported()` returns true
+- If unsupported, messaging features will be disabled gracefully
+</Accordion>
+
+<Accordion title="Authentication Errors">
+- Ensure Firebase Authentication is enabled in your project
+- Verify that sign-in methods are configured properly in Firebase Console
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 8. Next Steps
+
+- Complete environment configuration in `vue.config.js` if deploying to production.
+- Run `npm run build` to generate production-ready code with your Firebase integration.
+- Consult the [Running Aura Locally & Quick Validation](../run-validate-deploy/local-run-validation) guide for verifying your setup.
+- Proceed to [Deploying to Firebase Hosting](../run-validate-deploy/firebase-deployment) to publish your configured app.
+
+---
+
+## Additional Resources
+
+- [Firebase Official Documentation](https://firebase.google.com/docs/web/setup) for in-depth Firebase setup
+- [Aura Setup Prerequisites](../setup-prerequisites/prerequisites) for system requirements
+- [Aura Installation & Repo Setup](../install-configure/repo-installation) for full onboarding
+- [Troubleshooting Common Issues](../run-validate-deploy/setup-troubleshooting) for help with configuration problems
+
+---
+
+By correctly configuring Firebase integration in Aura, you empower your community app to leverage real-time data, authentication, storage, and messaging services securely and reliably. Follow these steps methodically to achieve a smooth and stable connection that unlocks the full potential of Aura’s dynamic features.

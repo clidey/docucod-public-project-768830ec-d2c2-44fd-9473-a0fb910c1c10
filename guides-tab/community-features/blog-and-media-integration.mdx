@@ -1,0 +1,221 @@
+---
+title: "Integrating Blogs and Media"
+description: "Learn how Aura retrieves and displays blog articles from platforms like Medium and how to add and manage community partners with logos and links. Real examples showcase maintaining a rich content hub."
+---
+
+# Integrating Blogs and Media
+
+Discover how to enrich your Aura community web application by integrating blog articles from popular platforms like Medium and managing community partners with their logos and web links. This guide focuses exclusively on the Blogs and Partner integrations pages and components, showing you exactly how to display dynamic content that engages your community and showcases valuable external resources.
+
+---
+
+## 1. Overview
+
+### What This Guide Covers
+This guide helps you understand how Aura retrieves and presents blog articles from an external source (Medium) and how community partners can be displayed effectively with associated logos and URLs. You’ll learn the workflow behind these features, practical implementation details visible in the UI, and tips for customization.
+
+### Prerequisites
+- You have successfully set up your Aura app with working configuration for `generalConfig.blogs.medium` (Medium RSS feed URL).
+- Your Firebase project is configured to store and provide partner data.
+- Access to the Aura Admin or backend to manage partner and blog source settings.
+
+### Expected Outcome
+By following this guide, you will be able to:
+- Display the latest top blog articles from Medium on your Aura Blogs page.
+- Provide users with a direct link to the full Medium blog feed.
+- Showcase your community partners with clickable logos on the Partners page.
+
+### Time Estimate
+About 15-30 minutes depending on your familiarity with the Aura configuration.
+
+### Difficulty Level
+Intermediate - basic knowledge of Aura configuration and component structure required.
+
+---
+
+## 2. Understanding the Blogs Integration
+
+### How Aura Retrieves Blog Data
+Aura fetches blog posts through an RSS feed URL configured in `generalConfig.blogs.medium`. This URL points to the Medium blog feed of your community or organization.
+
+### Blogs.vue Page Structure
+- The `Blogs.vue` page composes two main components:
+  - **BlogsHeader**: Displays the page title 'Blogs' styled prominently.
+  - **BlogsDetails**: Loads and lists the top 10 blog posts fetched from Medium.
+
+### Displayed Content
+- BlogsDetails shows a responsive grid of blog cards representing individual posts.
+- Each blog card links directly to the Medium post.
+- A link to view more on the full Medium site is provided.
+
+### Loading and Error Handling
+- Skeleton loaders appear while data is loading.
+- A "Blogs Not Found" illustration and message display if no blog data is present.
+
+### Step-by-Step to Verify or Customize Blogs Display
+
+<Steps>
+<Step title="Verify Medium Blog Feed URL">
+Confirm the `generalConfig.blogs.medium` key in your app configuration points to the correct Medium RSS feed URL.
+</Step>
+<Step title="Check Blogs Header">
+Ensure the `BlogsHeader` component is correctly rendered with the title to maintain page branding.
+</Step>
+<Step title="Verify BlogsDetails Component Behavior">
+Open `BlogsDetails.vue` to confirm it fetches blog posts using the service method `getAllMediumBlogs` with the configured Medium feed.
+</Step>
+<Step title="Customize Blog Card Layout">
+Modify `BlogCard` component if you want to change how individual blog posts appear, such as adding thumbnails or excerpts.
+</Step>
+<Step title="Test Loading and Empty States">
+Load the Blogs page in different network conditions to check loaders and the 'Blogs Not Found' state behave appropriately.
+</Step>
+</Steps>
+
+<Tip>
+The RSS feed must be publicly accessible. Private blogs or feeds behind authentication will not be fetched.
+</Tip>
+
+---
+
+## 3. Managing Community Partners Integration
+
+### Overview of Partners Display
+The "Our Partners" section is shown in the `src/views/Events/Partners.vue` page.
+
+### Loading Partners
+- Partners are fetched from a backend service using `getAllPartners()`.
+- The page cross-references the event details' partner IDs with the fetched data.
+- It displays partner logos as clickable images linking to their official websites.
+
+### Layout and Styling
+- Partner logos are shown inside bordered boxes with hover tooltips showing partner names.
+- The design adapts to dark and light modes.
+
+### Step-by-Step to Manage Partners
+
+<Steps>
+<Step title="Add or Update Partner Entries">
+Manage partners via your backend or Aura Admin interface to add new partners including name, logo image URL, and social link.
+</Step>
+<Step title="Verify Partners are Linked to Events">
+Ensure the event data includes partner IDs in the `partners` array to show the right partners per event.
+</Step>
+<Step title="Check Partners.vue Data Loading">
+Review the Partners component's `getAllPartners` method triggers on page mount and populates partners correctly.
+</Step>
+<Step title="Review Image Loading and Links">
+Check partner images load properly, and links open in a new tab.
+</Step>
+</Steps>
+
+<Note>
+Caching or image proxy services may be necessary if partner logos are hosted externally and you want to improve load speed.
+</Note>
+
+---
+
+## 4. Practical Examples
+
+### Example: Medium Blog Integration
+Here’s an example of how the `BlogsDetails` component loads and displays blog data:
+
+```javascript
+methods: {
+  getMediumBlogs() {
+    this.loader = true;
+    service
+      .getAllMediumBlogs(this.config.generalConfig.blogs.medium)
+      .then(res => {
+        if (res.success) {
+          this.loader = false;
+          this.blogsData = res.data;
+          this.blogURL = this.blogsData.feed.link;
+        } else {
+          this.loader = false;
+        }
+      })
+      .catch(() => {
+        this.loader = false;
+      });
+  }
+}
+```
+
+### Example: Partners Display
+Partners component fetch method and rendering snippet:
+
+```javascript
+methods: {
+  getAllPartners() {
+    this.isLoading = true;
+    this.pData = [];
+    service.getAllPartners()
+      .then(res => {
+        if (res.success) {
+          this.partnersData = res.data;
+          this.eventDetails.partners.forEach(p => {
+            this.partnersData.forEach(obj => {
+              if (obj.id === p) {
+                this.pData.push(obj);
+              }
+            });
+          });
+        }
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.isLoading = false;
+      });
+  }
+}
+```
+
+Partner logos render inside a loop:
+
+```vue
+<v-col v-for="(item, i) in pData" :key="i">
+  <a :href="item.socialLinks.web" target="_blank">
+    <v-img :src="getImgUrl(item.image, 'noimage.jpg')" ...>
+      <template v-slot:placeholder>
+        <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+      </template>
+    </v-img>
+  </a>
+</v-col>
+```
+
+---
+
+## 5. Troubleshooting & Tips
+
+### Common Issues & Fixes
+- **Blogs Not Loading:** Check RSS feed URL is correct and publicly accessible. Inspect network calls for errors.
+- **No Partners Displayed:** Verify event's partner array is correctly populated and matches partner IDs.
+- **Images Not Showing:** Confirm image URLs are correct; check CORS or firewall rules if images are hosted remotely.
+
+### Best Practices
+- Use high-quality logos for partners with transparent backgrounds.
+- Regularly update the Medium blog RSS URL if switching blogging platforms.
+- Leverage Vuetify’s responsiveness to maintain good appearance on all devices.
+
+### Performance Considerations
+- Cache RSS feed responses server-side or client-side to reduce network calls.
+- Optimize image file sizes for fast loading.
+
+### Alternative Approaches
+- If Medium feed integration isn’t suitable, consider building a custom blog API and adjusting the `BlogsDetails` component accordingly.
+
+---
+
+## 6. Next Steps & Related Content
+
+- **Explore Managing and Featuring Blogs:** Learn how to customize blog displays and moderate content in [Managing and Featuring Blogs](../managing-content-events-team/managing-and-featuring-blogs).
+- **Enhance Event Promotion:** Combine blogs and partners with event listings detailed in [Managing Events Workflow](../managing-content-events-team/managing-events).
+- **Customize Themes and Offline Support:** Increase engagement with offline accessibility via [Theme Switching & Offline Operation (PWA)](../best-practices/using-theme-and-pwa-features).
+
+For configuration details, see [Project & Environment Configuration](../../getting-started/install-configure/project-configuration) and Firebase setup guidance.
+
+---
+
+Leveraging blogs and partners sections will enrich your community's digital presence, providing visitors with insightful articles and showcasing collaborative support through partners, all seamlessly managed through Aura.

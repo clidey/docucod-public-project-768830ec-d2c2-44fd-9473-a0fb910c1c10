@@ -1,0 +1,231 @@
+---
+title: "Install and Initial Setup"
+description: "Learn how to install project dependencies, configure essential environment variables, set up Vue CLI, and connect your local copy of Aura Main with a Firebase project. This walkthrough ensures a successful start regardless of your prior experience."
+---
+
+# Install and Initial Setup
+
+Welcome to the Aura Main installation and initial setup guide. This page walks you through installing project dependencies, configuring essential environment variables, integrating Vue CLI, and connecting your local Aura Main application with a Firebase project. Whether you're new to Vue.js or Firebase or have prior experience, this guide ensures you start on solid footing.
+
+---
+
+## 1. Workflow Overview
+
+### What You'll Accomplish
+- Install necessary software and dependencies
+- Configure Vue CLI for development and production
+- Set up and connect your local Aura Main app to your Firebase project
+- Verify your environment is ready for local development
+
+### Prerequisites
+- Node.js (version 12 or higher) installed on your machine
+- npm (comes with Node.js) or yarn for package management
+- Vue CLI installed globally (`npm install -g @vue/cli`)
+- A Firebase project created with access to its configuration
+
+### Expected Outcome
+After completing this setup, your Aura Main environment will be:
+- Properly installed with all dependencies
+- Configured to connect to Firebase services
+- Ready to run locally with Vue CLI's dev server
+- Set up for development, including service workers for offline support
+
+### Time Estimate
+Approximately 20–30 minutes depending on your internet speed and familiarity
+
+### Difficulty Level
+Beginner to Intermediate
+
+---
+
+## 2. Step-by-Step Instructions
+
+### Step 1: Clone the Aura Main Repository
+
+If you have not already done so, clone the Aura Main repository from GitHub:
+
+```bash
+git clone https://github.com/gdg-x/aura.git
+cd aura
+```
+
+_Ensure you have forked the repository if you plan on contributing or customizing._
+
+### Step 2: Install Project Dependencies
+
+Inside the Aura project folder, install dependencies using npm or yarn:
+
+```bash
+npm install
+# or
+# yarn install
+```
+
+This installs all packages required to run the app, including Vue, Vuetify, and Firebase libraries.
+
+### Step 3: Configure Firebase Connection
+
+Aura Main uses Firebase services for data storage, authentication, and messaging.
+
+1. Open `src/config/firebase.js`.
+2. Replace the existing `firebaseConfig` object with your Firebase project's config keys, which you can get from your Firebase Console under project settings.
+
+Example structure (replace values):
+
+```javascript
+const firebaseConfig = {
+  apiKey: '<YOUR-API-KEY>',
+  authDomain: '<YOUR-AUTH-DOMAIN>',
+  databaseURL: '<YOUR-DATABASE-URL>',
+  projectId: '<YOUR-PROJECT-ID>',
+  storageBucket: '<YOUR-STORAGE-BUCKET>',
+  messagingSenderId: '<YOUR-MESSAGING-SENDER-ID>',
+  appId: '<YOUR-APP-ID>'
+};
+```
+
+_Tip_: Ensure you use the **same Firebase project** configuration when setting up Aura Admin to maintain synchronization.
+
+### Step 4: Verify `vue.config.js` for PWA and Build Settings
+
+The project comes preconfigured with `vue.config.js` to optimize builds and enable Progressive Web App features. You normally do not need to change this initially unless customizing themes or service worker behavior.
+
+Key settings include:
+- Disabling prefetch plugins for better load
+- Setting Vuetify as a transpile dependency
+- Workbox configuration for service worker injected from `src/sw.js`
+
+### Step 5: Run the Local Development Server
+
+Start the Vue CLI development server to launch your local Aura app:
+
+```bash
+npm run serve
+# or
+# vue-cli-service serve
+```
+
+Watch the console output for localhost URL (usually `http://localhost:8080`). Open it in your browser.
+
+Expected:
+- Aura's homepage loads
+- No critical errors
+- Service worker registers in production mode (usually with `npm run build`)
+
+### Step 6: Initial Data Loading and UI Check
+
+On launch, Aura loads configuration data from Firebase Firestore.
+
+- If data loads successfully, the UI displays events, teams, and navigation.
+- If data is missing or connection fails, a message prompts to verify Firebase setup.
+
+You can refer to the Vuex store and App.vue logic to understand data fetching:
+- The store maintains UI navigation and config state.
+- `App.vue` handles service worker events and initial loading.
+
+### Step 7: Service Worker and Offline Support
+
+Service worker registration is handled in `src/registerServiceWorker.js`.
+
+- In production mode, the service worker enables offline caching and update checks.
+- When a new app version is available, a snackbar prompts you to refresh.
+
+_You do not need extra manual setup unless customizing PWA behavior._
+
+### Step 8: Optional - Install Vue CLI GUI for Easier Control
+
+To manage Vue CLI projects visually, you can install the Vue CLI GUI:
+
+```bash
+npm install -g @vue/cli-service-global
+vue ui
+```
+
+This interface helps configure, run, and build your project with friendly UI controls.
+
+---
+
+## 3. Examples & Configuration Snippets
+
+### Sample `firebaseConfig` Example
+
+```javascript
+const firebaseConfig = {
+  apiKey: 'AIzaSyXXX-XXXX-XXXX',
+  authDomain: 'myaurapp.firebaseapp.com',
+  databaseURL: 'https://myaurapp.firebaseio.com',
+  projectId: 'myaurapp',
+  storageBucket: 'myaurapp.appspot.com',
+  messagingSenderId: '419511997060',
+  appId: '1:419511997060:web:ce7aa0d308f6b484f868d1'
+};
+```
+
+### Run Dev Server Output Example
+
+```bash
+   App running at:
+   - Local:   http://localhost:8080/
+   - Network: http://192.168.x.x:8080/
+
+  Note that the development build includes helpful warnings.
+```
+
+When you visit, the homepage loads with navigation items: Home, Events, Team, Speakers, About, etc.
+
+---
+
+## 4. Troubleshooting & Tips
+
+<AccordionGroup title="Common Setup Challenges and Solutions">
+<Accordion title="Issue: Firebase Config Not Working">
+- Double-check your Firebase config keys in `src/config/firebase.js`.
+- Ensure your Firebase project is active and allows Firestore access.
+- Verify you are using the same project for both Aura Main and Aura Admin to prevent data sync issues.
+</Accordion>
+<Accordion title="Issue: Dev Server Won't Start or Shows Errors">
+- Confirm Node.js and npm are updated.
+- Delete `node_modules` and reinstall dependencies with `npm install`.
+- Check for port conflicts on 8080 or try running on a different port with:
+
+```bash
+npm run serve -- --port 3000
+```
+</Accordion>
+<Accordion title="Issue: Service Worker Not Registering in Dev Mode">
+- Service workers only register in production mode by default.
+- Test PWA features with:
+
+```bash
+npm run build
+npx serve -s dist
+```
+- Use Chrome DevTools Application tab to inspect service worker status.
+</Accordion>
+<Accordion title="Best Practices">
+- Always keep Firebase config files secure and do not expose sensitive keys publicly.
+- Use environment variables for sensitive settings when deploying.
+- Make sure your `vue.config.js` matches your community branding needs.
+- Regularly update dependencies to keep security and performance optimized.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 5. Next Steps & Related Content
+
+- **Connecting Aura Admin**: Link your Aura Main app with Aura Admin for community content management.
+- **Running Aura Locally & Quick Validation**: Learn how to validate your setup and troubleshoot UI issues.
+- **Configuring Firebase Integration**: Deep dive into securing and optimizing your Firebase setup.
+- **Deploying to Firebase Hosting**: Prepare your production build and deploy your app online.
+- **Troubleshooting Common Issues**: Comprehensive guide to solve frequent problems during setup and development.
+
+---
+
+This guide sets the foundation for using Aura Main effectively, ensuring you have a running local environment ready to showcase your community magic.
+
+---
+
+For any further assistance, consult the official GitHub repository, related documentation pages, or raise issues for community support.
+
+---

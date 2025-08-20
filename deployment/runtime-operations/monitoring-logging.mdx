@@ -1,0 +1,172 @@
+---
+title: "Monitoring & Logging"
+description: "Describes how to leverage Firebase Hosting and Console for real-time monitoring, usage analytics, and logging basic access. Introduces strategies for debugging via browser tools and Firebase logs, plus tips for integrating additional monitoring if needed."
+---
+
+# Monitoring & Logging
+
+Monitoring and logging are essential practices to ensure your Aura deployment stays healthy, performant, and easy to troubleshoot. This guide explains how to leverage Firebase Hosting and the Firebase Console for real-time monitoring, usage analytics, and basic access logging. It also introduces effective debugging strategies using browser developer tools and Firebase logs along with tips for integrating additional monitoring if necessary.
+
+---
+
+## Why Monitor & Log?
+
+Deploying Aura on Firebase Hosting gives you a globally available, scalable web app. However, understanding how your app is performing in production, how users engage with it, and quickly diagnosing issues when they arise are critical to maintaining community trust and app reliability.
+
+Monitoring lets you:
+- Track real-time traffic and usage patterns.
+- Identify slow requests or failures.
+- Ensure the service worker and PWA features work consistently.
+
+Logging lets you:
+- Capture errors or unusual behavior for analysis.
+- Audit access and usage events in Firestore and Authentication.
+- Fast-track debugging without digging into end-user complaints blindly.
+
+
+## 1. Firebase Hosting Monitoring
+
+Firebase Hosting provides built-in analytics and logs accessible through the Firebase Console.
+
+### Accessing Hosting Metrics
+
+1. Navigate to the [Firebase Console](https://console.firebase.google.com).
+2. Select your project (e.g., `myaurapp`).
+3. Go to the 'Hosting' section.
+
+Here you can see:
+- **Requests per second**: Traffic trends over time.
+- **Bandwidth usage**: Data sent to users.
+- **Response status codes**: Successes (200s), redirects, client errors (400s), and server errors (500s).
+
+### Using Hosting Logs
+
+Firebase Hosting itself doesn't expose raw server logs but summarizes request performance and errors.
+
+For more granular log data, rely on:
+- **Firestore Audit Logs** for database interactions.
+- **Cloud Functions logs** if your project uses backend functions.
+- **Browser console logs** if available via service worker messages.
+
+<Tip>
+Keep an eye on spikes in error rates or bandwidth to detect issues early. Sudden drops in traffic might indicate service availability problems.
+</Tip>
+
+
+## 2. Firebase Console Usage Analytics
+
+Firebase Analytics provides insights about user behavior and platform usage.
+
+- You can track active users, session durations, and user geography.
+- Custom analytics events can be integrated if you extend Aura with Firebase Analytics SDK.
+
+This helps you:
+- Understand community engagement.
+- Measure feature adoption (e.g., event lookups, speaker views).
+- Make data-driven decisions for improvements.
+
+
+## 3. Basic Access Logging
+
+While Firebase Hosting abstracts away many server details, some access information is recorded:
+
+- Access to files and pages is logged for bandwidth/reporting.
+- Firestore operations (reads/writes) appear in Firestore usage logs.
+- Authentication events (sign-ins, failures) appear in the Authentication tab's logs.
+
+Use the Firebase Console’s **Firestore** and **Authentication** dashboards to review recent activity.
+
+<Info>
+Firestore is configured with offline persistence enabled, ensuring consistent sync and audit trails even during connectivity changes.
+</Info>
+
+
+## 4. Debugging Strategies
+
+When things don't go as expected, several tools will help you identify problems efficiently.
+
+### Browser Developer Tools
+
+- Use Chrome DevTools (or your preferred browser) to inspect network requests, cache usage, and service worker activity.
+- The **Application** tab shows registered service workers, cached content, and storage.
+- The **Console** tab reveals JavaScript errors and custom debug messages emitted by Aura.
+
+### Firebase Logs
+
+- Access **Firestore** and **Authentication** logs from the Firebase Console to identify backend issues.
+- Look for failed reads/writes or auth errors that may impact front-end behavior.
+
+### Service Worker Logs
+
+If your PWA service worker encounters issues:
+- Logs are displayed in the browser DevTools console.
+- You can listen for `swUpdated` or cache-related events to verify offline functionality.
+
+### Practice Walkthrough
+
+If users report a feature not updating:
+1. Verify network requests in DevTools for errors or timeouts.
+2. Confirm Firestore permissions and connection.
+3. Inspect Firebase Authentication logs for session issues.
+4. Check service worker cache and update notifications.
+
+
+## 5. Integrating Additional Monitoring Tools
+
+For advanced production setups, you might consider:
+- **Google Cloud Logging** for aggregated logs including Firebase backend services.
+- Third-party monitoring like **Sentry**, **Datadog**, or **New Relic** if you add server-side components.
+- Custom analytics events sent via Firebase Analytics to track specific user interactions.
+
+
+## 6. Best Practices
+
+- Regularly review Firebase Console metrics to establish performance baselines.
+- Use environment-specific monitoring setups to differentiate staging vs. production.
+- Ensure service worker updates notify users properly to avoid stale content.
+- Audit Firestore security and access logs frequently to detect anomalies.
+
+
+## 7. Troubleshooting Common Issues
+
+<AccordionGroup title="Common Monitoring & Logging Issues">
+<Accordion title="No Traffic or Metrics Seen in Firebase Console">
+Check if you deployed the app to the correct Firebase project and Hosting site. Verify the `firebase.json` and `.firebaserc` files include the right project name and hosting configuration.
+
+Also, confirm that analytics or Firestore are enabled and receiving data.
+</Accordion>
+<Accordion title="Service Worker Not Registering or Updates Not Detected">
+Verify production build includes the service worker via `vue.config.js`. Use the browser DevTools Application tab to unregister old workers, clear caches, and reload.
+
+Check the console for errors related to service worker registration.
+</Accordion>
+<Accordion title="Firestore Reads/Writes Not Appearing in Logs">
+Confirm Firestore security rules allow operations.
+Check if offline persistence issues or Firestore SDK version mismatches cause data sync problems.
+</Accordion>
+<Accordion title="Authentication Logs Missing or No Sign-In Events">
+Check authentication methods configured in Firebase Console.
+Verify users are signing in correctly without errors.
+Monitor client-side for auth failures.
+</Accordion>
+</AccordionGroup>
+
+
+---
+
+## Additional Resources
+
+- [Firebase Console - Hosting](https://console.firebase.google.com/project/_/hosting)
+- [Firebase Console - Firestore](https://console.firebase.google.com/project/_/firestore)
+- [Firebase Console - Authentication](https://console.firebase.google.com/project/_/authentication)
+- [Chrome DevTools](https://developer.chrome.com/docs/devtools/)
+- Related docs:
+  - [Deploying to Firebase Hosting](../getting-started-run-validate-deploy/firebase-deployment)
+  - [Troubleshooting Setup & Common Issues](../getting-started-run-validate-deploy/setup-troubleshooting)
+  - [Backup & Disaster Recovery](../deployment-backup-security/backup-disaster-recovery)
+  - [Scaling & Performance Optimization](../deployment-runtime-operations/scaling-performance)
+
+
+---
+
+Maintaining clear visibility into your Aura app’s operation enables your community to thrive uninterrupted. Use this guide as your starting point to establish monitoring and logging best practices tailored to your deployment needs.
