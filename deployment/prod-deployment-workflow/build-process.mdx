@@ -1,0 +1,200 @@
+---
+title: "Building the Application"
+description: "Explains how to prepare the app for deployment using the production build command. Covers how to optimize assets, understand the output directory (`dist`), and verify that the build is ready for hosting."
+---
+
+# Building the Application
+
+Preparing Aura for production deployment involves running a dedicated build process that optimizes your application assets, bundles the source code, and generates output ready to be hosted on production servers such as Firebase Hosting. This guide walks you through the essential steps to build Aura, understand the output, and verify readiness for deployment.
+
+---
+
+## 1. Purpose of the Production Build
+
+When you develop Aura locally, the app runs in development mode, prioritizing fast rebuilds and detailed debugging. However, for production, you need a build optimized for performance, smaller bundle size, and efficient asset management. The production build command achieves this by:
+
+- Minimizing and bundling JavaScript and CSS files
+- Including only the code and assets your app uses
+- Pre-generating a `dist` directory that contains everything needed to serve the app
+- Preparing a service worker for offline and caching capabilities
+
+This ensures users experience fast loading times, smooth interactions, and offline support.
+
+---
+
+## 2. Running the Production Build
+
+Aura uses Vue CLI to manage the build process. To generate a production-ready build, follow these steps:
+
+<Steps>
+<Step title="Install Dependencies">
+Ensure all project dependencies are installed. In your project root, run:
+
+```bash
+npm install
+```
+
+This step guarantees all required packages are ready for the build.
+</Step>
+
+<Step title="Run the Build Command">
+Execute the Vue CLI production build:
+
+```bash
+npm run build
+```
+
+This command triggers the webpack build process which:
+- Bundles all Vue components
+- Transpiles JavaScript for browser compatibility
+- Optimizes and minifies CSS and JavaScript
+- Generates service worker files according to `vue.config.js` settings
+
+Depending on your machine, this usually takes a few moments.
+</Step>
+
+<Step title="Locate the Output Directory">
+After successful build completion, find your production app files inside the `dist` directory at your project root.
+
+This folder contains:
+- `index.html` — the app entry point
+- JavaScript and CSS bundles
+- `service-worker.js` for offline caching
+- Static assets such as images and fonts
+
+You will deploy this folder’s contents to your hosting provider.
+</Step>
+</Steps>
+
+---
+
+## 3. Understanding the Output (`dist` directory)
+
+The `dist` folder is your complete, self-contained web app ready for hosting. Key points about the directory and its contents:
+
+- **Index.html:** The core HTML file that bootstraps the app. It references optimized JavaScript and CSS files.
+- **Bundled JavaScript and CSS:** Minified and compressed files ensure fast loading.
+- **Service Worker:** Injected by Vue CLI’s PWA plugin, it manages caching and offline capabilities.
+- **Static Assets:** Images and fonts used by the app are copied and hashed for cache busting.
+
+The structure and contents of `dist` are designed specifically to work well with Firebase Hosting’s default setup.
+
+<Tip>
+Avoid manually modifying files inside `dist`. Instead, change source code or configuration and re-run the build.
+</Tip>
+
+---
+
+## 4. Optimizing Assets During Build
+
+Aura’s build pipeline automatically handles critical optimizations, including:
+
+- **Tree-shaking:** Removes unused code from the final bundle.
+- **Code Splitting:** Splits large JavaScript files into smaller chunks loaded on demand.
+- **CSS Extraction:** Extracts CSS into separate files, allowing parallel loading.
+- **Asset Hashing:** Filenames contain hashes to ensure updated files load fresh on users’ browsers.
+
+The build leverages configuration from `vue.config.js` where features like disabling source maps (`productionSourceMap: false`), PWA options, and service worker settings reside.
+
+---
+
+## 5. Verifying the Production Build
+
+Before deployment, confirm your production build works as expected by:
+
+- Serving the `dist` folder locally using a static server, e.g.: 
+
+```bash
+npx serve dist
+```
+
+- Opening the local URL in a browser and checking:
+  - The app loads without errors
+  - Navigation works smoothly
+  - Offline mode functions (try disconnecting your network)
+  - No console errors are present
+
+- Inspecting the content of files for obvious issues
+
+Testing locally helps catch problems early, ensuring your users get a flawless experience.
+
+<Note>
+Remember to test in an environment that mimics your intended production browser support and network conditions.
+</Note>
+
+---
+
+## 6. Production Build Best Practices
+
+- **Consistent Environment:** Run builds on a stable environment to avoid discrepancies.
+- **Keep Dependencies Updated:** Ensures optimized and secure builds.
+- **Monitor Bundle Size:** Regularly review bundle sizes to identify potential bloat.
+- **Leverage Vue CLI Configuration:** Customize `vue.config.js` carefully to control build output.
+
+---
+
+## 7. Common Pitfalls & Troubleshooting
+
+<AccordionGroup title="Production Build Issues and Solutions">
+<Accordion title="Build Command Fails with Errors">
+- Ensure `node` and `npm` versions meet the minimum required versions.
+- Check for missing dependencies by running `npm install`.
+- Read error messages carefully; syntax or dependency errors in source code can cause failures.
+</Accordion>
+
+<Accordion title="Dist Folder Missing or Not Updated">
+- Confirm the build command completed successfully without errors.
+- Delete the existing `dist` folder and re-run the build.
+</Accordion>
+
+<Accordion title="App Loads but Shows Blank or Errors">
+- Use browser developer tools to inspect console errors.
+- Verify service worker registration; conflicts might cause outdated content.
+- Try clearing browser cache or use incognito mode.
+</Accordion>
+
+<Accordion title="Offline Mode Not Working">
+- Confirm the service worker is registered and running.
+- Check PWA and workbox settings in `vue.config.js`.
+- Make sure files are served with correct headers from your hosting platform.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 8. Next Steps After Building
+
+With your production build ready, the typical next step is to deploy the contents of the `dist` folder to your hosting provider — for Aura, Firebase Hosting is the primary target.
+
+Refer to the [Deploying to Firebase Hosting](./firebase-hosting-deploy) guide for detailed instructions on:
+
+- Configuring `firebase.json` to serve your build
+- Running Firebase CLI commands to upload and deploy
+- Validating a successful deployment
+
+Together, these steps complete a smooth path from source code to a live, production-ready community app.
+
+---
+
+### Additional Resources
+
+- [Running Aura Locally & Validation](../../getting-started/installation-and-configuration/local-run-validation) - Validate your app before production build.
+- [Firebase Integration & Configuration](../../getting-started/installation-and-configuration/firebase-configuration) - Preparing Firebase details before deployment.
+- [Troubleshooting Setup Issues](../../getting-started/installation-and-configuration/troubleshooting) - Common build & deployment problem analysis.
+- [Aura Admin Setup Prerequisite](../../getting-started/setup-prerequisites/aura-admin-notice) - Ensure admin backend is set up correctly.
+
+---
+
+By following this build process, you ensure your Aura app delivers a fast, reliable, and polished experience for your community members and event participants.
+
+
+---
+
+# Linking to Navigation and Related Content
+
+- For setup before build, see: [Environment Setup & Configuration](/deployment/prod-deployment-workflow/environment-setup)
+- To continue deploying your built app: [Firebase Hosting & Deployment](/deployment/prod-deployment-workflow/firebase-hosting-deploy)
+- Learn about the offline capabilities: [Service Worker, Offline Mode & App Updates](/deployment/operations-monitoring-maintenance/service-worker-pwa-updates)
+
+
+# End of Document
