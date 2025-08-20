@@ -1,0 +1,213 @@
+---
+title: "Firebase Security Setup"
+description: "Instructions on setting up and verifying Firebase authentication, rules, and best practices for minimizing access risks to your hosting and storage. Helps administrators avoid common pitfalls by securing project-level permissions and assets."
+---
+
+# Firebase Security Setup
+
+Securing your Aura deployment on Firebase is crucial to protect sensitive data, user information, and application assets. This guide provides clear instructions on configuring Firebase Authentication, Firestore and Storage security rules, and best practices to minimize unauthorized access and potential vulnerabilities.
+
+---
+
+## 1. Firebase Authentication Setup
+
+Firebase Authentication is the foundation for controlling access to your Aura app's protected resources.
+
+### Key Objectives
+- Verify that only authorized users (such as admins) can access management features.
+- Support anonymous or guest access where appropriate for public content.
+
+### Steps to Configure
+
+1. **Enable Authentication Providers:**
+   - Navigate to the Firebase Console > Authentication > Sign-in Method.
+   - Enable Email/Password or any other sign-in providers your admin users will use.
+
+2. **Integrate Authentication in Aura Admin:**
+   - Ensure your Aura Admin interface uses Firebase Auth SDK for login and enforced session checks.
+
+3. **Restrict Access by User Role:**
+   - Assign custom claims or manage user metadata in Firestore to differentiate Admins from public users.
+
+4. **Use Firebase Authentication Checks in Security Rules:**
+   - Leverage `request.auth` in Firestore and Storage rules to validate user identity and permissions.
+
+<Tip>
+Always test authentication flows in a staging environment before rolling out to production to avoid locking out legitimate users.
+</Tip>
+
+---
+
+## 2. Firestore Security Rules
+
+Your core data for events, teams, partners, and configurations reside in Firestore collections. Security rules govern who can read or write this data.
+
+### Best Practices
+
+- **Read-Only Public Access:** Allow unauthenticated or general users to read public data such as event listings, team profiles, and partners.
+- **Write Access Restricted to Admins:** Only authenticated admin users should have write permissions.
+- **Validate Data Structure:** Use rules to check the presence and type of essential fields during writes to maintain data integrity.
+
+### Example Rule Snippet
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public collections - read-only access
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /team/{memberId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /partners/{partnerId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Fallback rule
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+<Tip>
+- Use `custom claims` in Firebase Authentication to assign `admin` roles.
+- Test rules thoroughly using the Firebase Emulator Suite or the Firebase Console Rules Simulator.
+</Tip>
+
+<Tip>
+- Restrict write operations rigorously. Any inadvertent open write rule can expose your data to tampering.
+</Tip>
+
+---
+
+## 3. Firebase Storage Security Rules
+
+Storage rules protect assets uploaded for your Aura site, such as images for team members, event photos, and partner logos.
+
+### Key Guidelines
+
+- **Read Permissions:** Allow public reads for images that are displayed publicly.
+- **Write Permissions:** Restrict upload, update, or delete operations to authenticated admin users only.
+
+### Example Rule Snippet
+```
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Allow public read access to all files
+      allow read: if true;
+      // Restrict writes to authenticated admins
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+  }
+}
+```
+
+<Tip>
+Consider organizing your storage into folders (e.g., `/team/`, `/events/`) to allow fine-grained control per asset type.
+</Tip>
+
+---
+
+## 4. Minimizing Access Risks
+
+### Secure Firebase Project-Level Access
+
+- **Use Principle of Least Privilege:** Assign only necessary permissions to Firebase users and service accounts.
+- **Restrict Firebase Console Access:** Limit who can access the Firebase Console to trusted administrators.
+- **Enable Multi-Factor Authentication (MFA):** Protect Firebase accounts with MFA for enhanced security.
+
+### Protect Hosting Access
+
+- The Aura web app is deployed publicly via Firebase Hosting, intended to be accessible to all users.
+- Restrict backend operations requiring authentication; use Firestore and Storage rules.
+
+### Monitor and Audit
+
+- Use Firebase Console logs and audit features to monitor access and changes.
+- Consider integrating third-party monitoring and alerting for unusual activity.
+
+<Tip>
+Regularly review your Firebase IAM roles and Firestore/Storage rules to ensure they meet evolving security needs.
+</Tip>
+
+---
+
+## 5. Common Pitfalls and How to Avoid Them
+
+| Issue | Cause | Solution |
+|---|---|---|
+| Overly permissive Firestore rules | Testing convenience left ‘read, write: if true’ | Tighten rules to restrict writes, test with emulator before production. |
+| Missing authentication enforcement | Not checking `request.auth` in rules | Include checks for `request.auth != null` and confirm user roles. |
+| Public write access to Storage | Open rules without auth conditions | Apply strict auth checks, segment storage by folders if needed. |
+| Firebase project access to many users | Excessive Firebase console access | Limit project owners and editors, enable MFA. |
+
+---
+
+## 6. Verification & Testing
+
+### Testing Security Rules
+
+- Use the **Firebase Emulator Suite** to simulate Firestore and Storage security rules locally.
+- Employ the **Firebase Console Rules Simulator** for quick ad hoc checks.
+
+### Verifying Authentication Enforcement
+
+- Attempt accessing write paths as an unauthenticated user to confirm denial.
+- Log in as admin and verify full access.
+
+<Tip>
+Run your verification tests before deploying to production to catch security gaps early.
+</Tip>
+
+---
+
+## 7. Additional Resources and Next Steps
+
+- [Deploying Aura to Firebase: A Step-by-Step Guide](/guides/getting-started-workflows/deploying-aura-to-firebase)
+- [Environment Configuration for Deployment](/deployment/deployment-essentials/environment-configuration)
+- [Monitoring and Logging Operations](/deployment/operations-and-maintenance/monitoring-and-logging)
+- [Troubleshooting Deployment Issues](/deployment/operations-monitoring-maintenance/troubleshooting-deployment)
+
+<Note>
+Security is an ongoing process. Combine robust rules with continuous monitoring and regular reviews to maintain a secure Aura environment.
+</Note>
+
+---
+
+## Appendix: Example Custom Claim Setup for Admin Role
+
+You can assign an `admin` custom claim to users from the Firebase Admin SDK (server or Cloud Functions):
+
+```javascript
+const admin = require('firebase-admin');
+
+admin.auth().setCustomUserClaims(uid, { admin: true })
+  .then(() => {
+    console.log('Admin claim set for user:', uid);
+  })
+  .catch(error => {
+    console.error('Error setting custom claim:', error);
+  });
+```
+
+Users then need to re-authenticate to refresh the token and gain admin privileges enforced by security rules.
+
+---
+
+This comprehensive Firebase Security Setup allows Aura administrators to confidently protect their deployment assets while delivering a seamless and secure public user experience.
