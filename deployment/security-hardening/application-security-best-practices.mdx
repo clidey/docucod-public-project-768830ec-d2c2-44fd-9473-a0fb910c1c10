@@ -1,0 +1,171 @@
+---
+title: "Application Security Best Practices"
+description: "Checklists and actionable advice for locking down your production Aura deployment. Covers HTTPS usage, PWA security settings, code/external script hygiene, and protecting public-facing assets."
+---
+
+# Application Security Best Practices
+
+Securing your Aura deployment is paramount to protect your community's data, maintain user trust, and ensure uninterrupted service. This guide delivers clear, actionable best practices to lock down your production Aura web application. We focus on essential facets such as HTTPS encryption, Progressive Web App (PWA) security settings, managing external code, and safeguarding public-facing assets.
+
+---
+
+## 1. Enforce HTTPS for All Traffic
+
+### Why HTTPS Matters
+Transport Layer Security (TLS) via HTTPS ensures all data transferred between your users and the Aura app is encrypted and protected against interception or tampering. With Firebase Hosting used in Aura deployments, enabling HTTPS is straightforward and non-negotiable for maintaining confidentiality and integrity.
+
+### Implementation
+- Firebase Hosting automatically provides valid SSL certificates for your site, enabling HTTPS by default.
+- Confirm that the Firebase Hosting configuration does not allow unsecured HTTP traffic and redirects all requests to HTTPS.
+
+### Best Practices
+- Always enforce HTTPS redirects in your `firebase.json` by using the `redirects` or `rewrites` rules if necessary.
+- Do not disable HTTPS enforcement for API or static asset requests.
+
+<Tip>
+Always verify your deployed URL starts with ’https://’ and that the browser shows a secure lock icon. Browsers will warn users if any part of the site is served insecurely.
+</Tip>
+
+---
+
+## 2. Harden Progressive Web App (PWA) Security Settings
+
+Aura leverages PWA capabilities for offline access and native-app-like experiences. Applying security best practices to PWA configurations is critical.
+
+### Key Areas to Secure
+- **Service Worker**: Ensure the service worker script has minimal privileges and is served over HTTPS.
+- **Workbox Configuration**: Use Workbox’s InjectManifest mode wisely to control caching and updates while avoiding caching potentially sensitive data.
+- **Manifest File**: Review the PWA manifest (`manifest.json`) to limit exposure of identifiable or sensitive information.
+
+### Configuration Recommendations
+- Confirm your `vue.config.js` is set to use cached service-worker files securely with:
+  ```js
+  pwa: {
+    workboxPluginMode: 'InjectManifest', // to control caching scope
+    workboxOptions: {
+      swSrc: './src/sw.js',
+      swDest: 'service-worker.js',
+    },
+    themeColor: '#4A90E2',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+  }
+  ```
+- Ensure your custom service worker restricts caching to only public assets and non-sensitive API calls.
+- Implement cache versioning and controlled updates to prevent stale or malicious cached content.
+
+<Note>
+Aura’s service worker automatically prompts users to refresh the app when a new version is available, preventing prolonged use of potentially outdated or vulnerable code.
+</Note>
+
+---
+
+## 3. Maintain Code and External Script Hygiene
+
+Ensuring your Aura deployment only loads trusted code is vital for security and performance.
+
+### Internal Code Practices
+- Regularly audit your `src/` codebase for unused or deprecated modules.
+- Keep dependencies up-to-date, especially security patches in VueJS, Vuetify, Firebase SDK, and other libraries.
+- Avoid embedding sensitive keys or credentials directly in the frontend code.
+
+### External Scripts
+- Limit usage of third-party scripts. Aura uses Google Analytics by default; ensure this script is loaded securely and respects user privacy.
+- Use Subresource Integrity (SRI) where applicable for externally loaded resources to detect unexpected modifications.
+
+### Secure Configuration Files
+- Do not commit API keys or secrets directly to the public repository.
+- Use Firebase security rules and environment configurations to secure access.
+
+<Tip>
+Review script sources periodically for unexpected changes and monitor your audit logs for unusual activity.
+</Tip>
+
+---
+
+## 4. Protect Public-Facing Assets and URLs
+
+Aura exposes various public assets including team member profiles, events, and blog posts. Securing these while offering controlled public access is essential.
+
+### Public Asset Security
+- Ensure no sensitive or administrative data is exposed via public URLs.
+- Use Firebase Firestore security rules to restrict access appropriately.
+- Validate that only intended public data is returned by API calls.
+
+### Robots and Crawler Controls
+- Provide a protective `robots.txt` file at the site root to guide search engine crawling.
+  ```
+  User-agent: *
+  Disallow:
+  ```
+- Avoid disallowing content unless strictly required.
+
+### Access Control
+- Public URLs such as team member pages should not reveal internal identifiers or sensitive internal state.
+- Disable any public write or modification capabilities accessible from the frontend.
+
+<Warning>
+Do not expose Firebase admin APIs or credentials in client-side code.
+</Warning>
+
+---
+
+## 5. Additional Security Recommendations
+
+- **Firebase Security**: Complement frontend security by configuring secure Firestore and Storage rules alongside Firebase Authentication. For full details, see the [Firebase Security Setup](https://aura.docs/deployment/security-hardening/firebase-security-setup).
+- **Content Security Policy (CSP)**: While not default in Aura, consider implementing a strict CSP header via Firebase Hosting to mitigate cross-site scripting (XSS) attacks.
+- **Regular Audits**: Periodically scan your Aura deployment for vulnerabilities using tools like Lighthouse, OWASP ZAP, or manual code reviews.
+
+---
+
+## 6. Troubleshooting Common Security Issues
+
+<AccordionGroup title="Common Security Troubleshooting">
+<Accordion title="Service Worker Cache Issues">
+If users see stale content or security warnings:
+- Clear the browser cache.
+- Trigger a manual refresh via the app’s refresh prompt.
+- Verify that your service worker’s `sw.js` implements correct caching strategies.
+</Accordion>
+<Accordion title="Mixed Content Errors">
+Check the browser console if HTTPS pages attempt to load HTTP resources:
+- Update all asset references to HTTPS.
+- Ensure Firebase Hosting enforces HTTPS redirect.
+</Accordion>
+<Accordion title="Public Data Exposure">
+If private data is inadvertently exposed:
+- Review Firebase Firestore security rules.
+- Audit API and Firestore queries in Aura code.
+- Remove or secure any exposed administrative endpoints.
+</Accordion>
+</AccordionGroup>
+
+<Check>
+For advanced help, consult [Troubleshooting Common Issues](https://aura.docs/getting-started/troubleshooting-validation/common-issues) and monitor logs via [Monitoring and Logging](https://aura.docs/deployment/operations-and-maintenance/monitoring-and-logging).
+</Check>
+
+---
+
+## Summary
+By implementing these security best practices, you safeguard your Aura web app deployment for a trustworthy community experience. From ensuring HTTPS encryption to managing your PWA's caching and protecting public assets, each layer adds to your app’s resilience against attacks and data leakage.
+
+Continue your security hardening journey with the related guides below.
+
+---
+
+### Related Documentation
+- [Firebase Security Setup](https://aura.docs/deployment/security-hardening/firebase-security-setup)
+- [Deploying Aura to Firebase](https://aura.docs/guides/getting-started-workflows/deploying-aura-to-firebase)
+- [Building & Deploying for Production](https://aura.docs/getting-started/configuration-run/production-build)
+- [Monitoring and Logging](https://aura.docs/deployment/operations-and-maintenance/monitoring-and-logging)
+- [Troubleshooting Common Issues](https://aura.docs/getting-started/troubleshooting-validation/common-issues)
+
+---
+
+### Practical Next Steps
+- Review your Firebase Hosting and Firestore security rules.
+- Validate your Aura app in production mode over HTTPS.
+- Test your PWA’s offline and update behaviors.
+- Schedule periodic security scans and dependency updates.
+
+Implementing these practices will help you confidently launch and maintain a secure Aura deployment that protects both your users and your community data.
