@@ -1,0 +1,229 @@
+---
+title: "Setting up Aura Admin"
+description: "Highlights the need to fork and set up the Aura Admin repository alongside the main app using the same Firebase project, ensuring both are configured correctly from the start."
+---
+
+# Setting up Aura Admin
+
+This guide walks you through the essential steps to fork, configure, and set up the Aura Admin repository alongside the main Aura web application. Both repositories must be connected to the same Firebase project to ensure seamless integration and synchronized community management.
+
+---
+
+## 1. Overview
+
+Aura Admin is the management console for your community website running Aura Main. Setting up Aura Admin alongside Aura Main allows you to manage events, teams, speakers, and other community content efficiently while the Aura Main app serves your public site.
+
+By using the same Firebase project for both Aura and Aura Admin, you ensure consistent data, security settings, and configuration.
+
+---
+
+## 2. Prerequisites
+
+Before proceeding, ensure you have:
+
+- A Firebase account with sufficient permissions to create and manage projects
+- Basic familiarity with GitHub (forking, cloning, committing)
+- Node.js installed (version between 8.9.4 and 12.13.0 recommended)
+- Vue CLI installed globally (`npm install -g @vue/cli`)
+- Git installed and configured on your machine
+
+---
+
+## 3. Fork the Repositories
+
+Both Aura and Aura Admin are maintained in separate public repositories. You must fork both to your GitHub account.
+
+### Steps:
+
+1. Navigate to the repositories:
+   - Aura Main: [https://github.com/gdg-x/aura](https://github.com/gdg-x/aura)
+   - Aura Admin: [https://github.com/gdg-x/aura-admin](https://github.com/gdg-x/aura-admin)
+
+2. Click on the **Fork** button on each repository's GitHub page.
+3. Your forks now belong to your GitHub account.
+
+---
+
+## 4. Clone Your Forks Locally
+
+Clone both repositories to your local development environment to begin configuration.
+
+```bash
+# Clone Aura Main
+git clone https://github.com/yourusername/aura.git
+
+# Clone Aura Admin
+git clone https://github.com/yourusername/aura-admin.git
+```
+
+Ensure you replace `yourusername` with your actual GitHub username.
+
+---
+
+## 5. Set Up a Shared Firebase Project
+
+Both Aura and Aura Admin **must** use the same Firebase project to synchronize data and authentication.
+
+### Creating or Using an Existing Firebase Project
+
+1. Sign in to the [Firebase Console](https://console.firebase.google.com).
+2. Create a new project or select an existing project.
+3. In the project dashboard, select **Add App** (Web app) to register your Aura Main and Aura Admin web apps.
+
+### Obtain Firebase Config
+
+After adding your web app, navigate to the project **Settings** > **General** > **Your Apps** section.
+
+- Find the **Firebase SDK snippet** and select the **Config** option.
+- Copy the configuration snippet, which looks similar to this:
+
+```js
+apiKey: "Axxxxxxxxxxxxxxxxxxx",
+authDomain: "xxxxxx.firebaseapp.com",
+databaseURL: "https://xxxxxxxx.firebaseio.com",
+projectId: "xxxxxxxxx",
+storageBucket: "xxxxxxx.appspot.com",
+messagingSenderId: "xxxxxxxxxxx",
+appId: "1:xxxxxxxxx:web:xxxxxxx"
+```
+
+---
+
+## 6. Configure Firebase in Aura Main
+
+You must update the Firebase configuration in your Aura Main repository to reflect your Firebase project.
+
+### Steps:
+
+1. Open `src/config/firebase.js` in your Aura Main codebase.
+2. Replace the existing Firebase config object with your copied Firebase config values.
+
+Example:
+
+```js
+export default {
+  apiKey: "Axxxxxxxxxxxxxxxxxxx",
+  authDomain: "xxxxxx.firebaseapp.com",
+  databaseURL: "https://xxxxxxxx.firebaseio.com",
+  projectId: "xxxxxxxxx",
+  storageBucket: "xxxxxxx.appspot.com",
+  messagingSenderId: "xxxxxxxxxxx",
+  appId: "1:xxxxxxxxx:web:xxxxxxx"
+}
+```
+
+3. Save changes.
+
+---
+
+## 7. Configure Firebase in Aura Admin
+
+Repeat the Firebase configuration process in your Aura Admin repository to use the **same Firebase project**.
+
+1. Open the Firebase config file in Aura Admin (typically `src/config/firebase.js`).
+2. Update it with the exact Firebase configuration you copied **earlier**.
+3. Save the changes.
+
+---
+
+## 8. Verify Environment Compatibility
+
+Make sure both environments have the necessary dependencies and are ready to run.
+
+### Steps:
+
+- Open terminal inside both Aura and Aura Admin folders.
+- Run:
+
+```bash
+npm install
+```
+
+This installs all required dependencies.
+
+---
+
+## 9. Running Aura Admin and Aura Main Locally
+
+Launch your local development servers to validate setup.
+
+### Aura Admin
+
+```bash
+npm run serve
+```
+
+### Aura Main
+
+```bash
+npm run serve
+```
+
+Access both local servers via the URLs shown (commonly http://localhost:8080 or 8081).
+
+---
+
+## 10. Key Setup Tips and Best Practices
+
+- **Use the same Firebase project:** Using different projects will cause data desynchronization and break management workflows.
+- **Keep Firebase configs identical:** Even a minor mismatch can lead to runtime errors.
+- **Use compatible Node.js and Vue CLI versions:** Stick to recommended versions to avoid dependency issues.
+- **Fork both repos:** Don’t edit or deploy from the original repositories.
+
+---
+
+## 11. Common Pitfalls & Troubleshooting
+
+<AccordionGroup title="Common Setup Issues and How to Resolve">
+<Accordion title="Sync Issues Between Aura Admin and Aura Main">
+If you observe that changes made in Aura Admin don’t appear in Aura Main:
+
+- Confirm both apps use the same Firebase project ID.
+- Check Firebase config credentials are identical.
+- Clear browser cache or use incognito mode to bypass stale data.
+</Accordion>
+<Accordion title="Firebase Configuration Errors">
+Errors like "Permission denied" or "App not authorized" indicate incorrect Firebase setup.
+
+- Double-check authentication settings in Firebase Console.
+- Ensure Firebase config values in both repositories are current and correct.
+</Accordion>
+<Accordion title="Dependency or Build Failures">
+- Remove `node_modules` and `package-lock.json` and rerun `npm install`.
+- Verify Node.js version compatibility.
+- Use `npm audit fix` to resolve vulnerabilities if applicable.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 12. Next Steps
+
+- Proceed to configure environment variables and project-specific settings as detailed in the [Project & Environment Configuration](../install-configure/project-configuration) guide.
+- Run and validate Aura Main locally following [Running Aura Locally & Quick Validation](../run-validate-deploy/local-run-validation).
+- Deploy your configured app to Firebase Hosting with the instructions in [Deploying to Firebase Hosting](../run-validate-deploy/firebase-deployment).
+- For more advanced integration workflows, consult [Connecting Aura Admin for Community Management](../../guides-tab/getting-started/connecting-aura-admin).
+
+---
+
+## 13. Resources and References
+
+- [Aura Main GitHub Repository](https://github.com/gdg-x/aura)
+- [Aura Admin GitHub Repository](https://github.com/gdg-x/aura-admin)
+- [Firebase Console](https://console.firebase.google.com)
+- [Node.js Download & Installation](https://nodejs.org/en/download/)
+- [Vue CLI Documentation](https://cli.vuejs.org/)
+
+---
+
+## 14. Summary
+
+Setting up Aura Admin alongside the Aura Main app demands your attention to using the same Firebase project to achieve perfect harmony between your admin panel and public facing app. Forking and cloning both repositories, configuring Firebase identically, and running the apps locally set you on the path to efficient community management and deployment success.
+
+
+<Tip>
+Always test the connection and data flow between Aura Admin and Aura Main early by creating sample events or team data in Aura Admin and verifying their appearance in Aura Main.
+</Tip>
+
+
+---
