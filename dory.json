@@ -26,24 +26,21 @@
       {
         "groups": [
           {
-            "group": "Product Introduction \u0026 Value",
+            "group": "Product Introduction \u0026 Core Concepts",
             "pages": [
-              "overview/intro-value/product-overview",
-              "overview/intro-value/target-audience-usecases"
+              "overview/product-intro-core-concepts/what-is-aura",
+              "overview/product-intro-core-concepts/value-proposition",
+              "overview/product-intro-core-concepts/core-concepts"
             ]
           },
           {
-            "group": "System Architecture \u0026 Integration",
+            "group": "Architecture, Features \u0026 Audience",
             "pages": [
-              "overview/architecture-system/system-architecture",
-              "overview/architecture-system/integration-overview"
-            ]
-          },
-          {
-            "group": "Core Features \u0026 Key Concepts",
-            "pages": [
-              "overview/core-features-concepts/quick-features",
-              "overview/core-features-concepts/core-concepts-terminology"
+              "overview/architecture-features-users/high-level-architecture",
+              "overview/architecture-features-users/architecture-diagram",
+              "overview/architecture-features-users/feature-glance",
+              "overview/architecture-features-users/audience-usecases",
+              "overview/architecture-features-users/integration-points"
             ]
           }
         ],
@@ -52,33 +49,27 @@
       {
         "groups": [
           {
-            "group": "Preparation \u0026 System Requirements",
+            "group": "Setup \u0026 Prerequisites",
             "pages": [
-              "getting-started/preparation/prerequisites",
-              "getting-started/preparation/system-requirements"
+              "getting-started/setup-prerequisites/about-aura",
+              "getting-started/setup-prerequisites/prerequisites",
+              "getting-started/setup-prerequisites/aura-admin-note"
             ]
           },
           {
-            "group": "Installation \u0026 Setup",
+            "group": "Installation \u0026 Configuration",
             "pages": [
-              "getting-started/installation/getting-the-code",
-              "getting-started/installation/installing-dependencies",
-              "getting-started/installation/first-project-setup"
+              "getting-started/install-configure/repo-installation",
+              "getting-started/install-configure/firebase-setup",
+              "getting-started/install-configure/project-configuration"
             ]
           },
           {
-            "group": "Configuration \u0026 First Run",
+            "group": "Running, Validating \u0026 Deploying",
             "pages": [
-              "getting-started/configuration-run/firebase-setup",
-              "getting-started/configuration-run/local-run",
-              "getting-started/configuration-run/production-build"
-            ]
-          },
-          {
-            "group": "Troubleshooting \u0026 Validation",
-            "pages": [
-              "getting-started/troubleshooting-validation/common-issues",
-              "getting-started/troubleshooting-validation/first-validation"
+              "getting-started/run-validate-deploy/local-run-validation",
+              "getting-started/run-validate-deploy/firebase-deployment",
+              "getting-started/run-validate-deploy/setup-troubleshooting"
             ]
           }
         ],
@@ -87,26 +78,26 @@
       {
         "groups": [
           {
-            "group": "Getting Started \u0026 Core Workflows",
+            "group": "Getting Started",
             "pages": [
-              "guides/getting-started-workflows/deploying-aura-to-firebase",
-              "guides/getting-started-workflows/initial-configuration-and-theme-setup",
-              "guides/getting-started-workflows/understanding-aura-structure-and-navigation"
+              "guides-tab/getting-started/install-and-setup",
+              "guides-tab/getting-started/connecting-aura-admin",
+              "guides-tab/getting-started/deploying-on-firebase"
             ]
           },
           {
-            "group": "Managing Content: Events, Team, and Blogs",
+            "group": "Community Features in Action",
             "pages": [
-              "guides/managing-content-events-team/publishing-and-managing-events",
-              "guides/managing-content-events-team/showcasing-team-and-speakers",
-              "guides/managing-content-events-team/managing-and-featuring-blogs"
+              "guides-tab/community-features/managing-events",
+              "guides-tab/community-features/team-speaker-profiles",
+              "guides-tab/community-features/blog-and-media-integration"
             ]
           },
           {
-            "group": "Advanced Customization \u0026 Optimization",
+            "group": "Best Practices \u0026 Advanced Usage",
             "pages": [
-              "guides/advanced-customization-and-optimization/optimizing-pwa-and-offline-support",
-              "guides/advanced-customization-and-optimization/branding-and-theme-advanced"
+              "guides-tab/best-practices/using-theme-and-pwa-features",
+              "guides-tab/best-practices/seo-and-performance"
             ]
           }
         ],
@@ -115,26 +106,31 @@
       {
         "groups": [
           {
-            "group": "Deployment Essentials",
+            "group": "Deployment Workflow",
             "pages": [
-              "deployment/deployment-essentials/environment-configuration",
-              "deployment/deployment-essentials/production-build",
-              "deployment/deployment-essentials/firebase-hosting-deployment"
+              "deployment/deployment-workflow/deployment-prerequisites",
+              "deployment/deployment-workflow/production-build-deploy"
             ]
           },
           {
-            "group": "Operations \u0026 Maintenance",
+            "group": "Environment Configuration",
             "pages": [
-              "deployment/operations-and-maintenance/monitoring-and-logging",
-              "deployment/operations-and-maintenance/scaling-and-performance",
-              "deployment/operations-and-maintenance/backup-and-disaster-recovery"
+              "deployment/environment-configuration/firebase-config-setup",
+              "deployment/environment-configuration/environment-variables"
             ]
           },
           {
-            "group": "Security Hardening",
+            "group": "Runtime Operations",
             "pages": [
-              "deployment/security-hardening/firebase-security-setup",
-              "deployment/security-hardening/application-security-best-practices"
+              "deployment/runtime-operations/monitoring-logging",
+              "deployment/runtime-operations/scaling-performance"
+            ]
+          },
+          {
+            "group": "Backup \u0026 Security",
+            "pages": [
+              "deployment/backup-security/backup-disaster-recovery",
+              "deployment/backup-security/security-hardening"
             ]
           }
         ],
