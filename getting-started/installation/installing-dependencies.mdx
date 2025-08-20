@@ -1,0 +1,205 @@
+---
+title: "Installing Dependencies"
+description: "Walks the user through Node.js and Vue CLI setup, and executing npm install. Provides guidance on managing and verifying required packages to ensure a smooth installation."
+---
+
+# Installing Dependencies
+
+This guide walks you through setting up the essential dependencies for Aura by installing Node.js, Vue CLI, and running `npm install` to prepare your development environment. Properly managing and verifying installed packages ensures smooth operation and avoids common pitfalls during setup.
+
+---
+
+## 1. Prerequisites
+
+Before proceeding, confirm the following prerequisites are met:
+
+- **Node.js Installed:** Aura requires Node.js to run JavaScript outside the browser. Use Node.js version 14.x or later.
+- **Vue CLI Installed:** Vue CLI facilitates project scaffolding and management.
+- **Internet Access:** Needed to download packages from npm registry.
+
+If you have not installed Node.js or Vue CLI, follow these steps:
+
+### Install Node.js
+
+1. Visit the [official Node.js website](https://nodejs.org/).
+2. Download the LTS version suitable for your operating system.
+3. Run the installer and follow the prompts.
+4. Verify the installation by opening a terminal or command prompt and typing:
+
+```bash
+node -v
+npm -v
+```
+
+Expected output:
+
+```
+v14.x.x (or higher)
+6.x.x (or higher)
+```
+
+### Install Vue CLI
+
+1. After installing Node.js, install Vue CLI globally using npm:
+
+```bash
+npm install -g @vue/cli
+```
+
+2. Verify installation:
+
+```bash
+vue --version
+```
+
+Expected output is the Vue CLI version number (e.g., 4.x.x or higher).
+
+<Check>
+Ensure Node.js and Vue CLI versions meet the minimum requirements before continuing.
+</Check>
+
+---
+
+## 2. Running npm install to Install Project Dependencies
+
+After cloning or obtaining the Aura source code (see the "[Getting the Code](./getting-started/installation/getting-the-code)" guide), you need to install its dependencies.
+
+### Step-by-Step Instructions
+
+1. **Open your terminal/command prompt.**
+2. **Navigate to the project directory** where the Aura source code resides:
+
+```bash
+cd path/to/aura
+```
+
+3. **Run npm install:**
+
+```bash
+npm install
+```
+
+This command reads the `package.json` and `package-lock.json` files to install exact versions of required packages.
+
+4. **Wait for the installation to complete.** A successful install results in a `node_modules` folder with all packages.
+
+5. **Verify successful installation:**
+
+- Look for the absence of errors in the console output.
+- Run:
+
+```bash
+npm ls
+```
+
+It will display the dependency tree. Check for any missing or invalid packages.
+
+<Note>
+If you encounter errors such as permission issues or network errors, see the Troubleshooting section below.
+</Note>
+
+---
+
+## 3. Managing and Verifying Required Packages
+
+To maintain a stable development environment, ensure these key packages are installed correctly:
+
+| Package Name       | Purpose                          |
+|--------------------|---------------------------------|
+| `vue`              | Core Vue.js framework            |
+| `@vue/cli-service` | Vue CLI service utilities        |
+| `firebase`         | Firebase SDK for backend integration |
+| `eslint`           | Code linting tool                |
+
+You can confirm these packages by inspecting `package.json` under dependencies and devDependencies.
+
+### Verifying Specific Package Versions
+
+Run:
+
+```bash
+npm list <package-name>
+```
+
+Example:
+
+```bash
+npm list vue
+```
+
+Expected output shows the installed version, e.g., `vue@2.6.12`.
+
+---
+
+## 4. Troubleshooting Common Issues
+
+<AccordionGroup title="Common Installation Problems">
+<Accordion title="Network or Timeout Errors during npm install">
+
+- Check your internet connection.
+- Clear npm cache:
+
+  ```bash
+  npm cache clean --force
+  ```
+
+- Try using a different npm registry temporarily:
+
+  ```bash
+  npm install --registry=https://registry.npmjs.org/
+  ```
+
+</Accordion>
+
+<Accordion title="Permission Denied or EACCES Errors">
+
+- Avoid running npm commands with sudo unless necessary.
+- On macOS/Linux, fix permissions with:
+
+  ```bash
+  sudo chown -R $(whoami) ~/.npm
+  ```
+
+- Consider using a Node version manager (nvm) to avoid global permission problems.
+
+</Accordion>
+
+<Accordion title="Missing or Invalid Packages Detected">
+
+- Delete `node_modules` and reinstall:
+
+  ```bash
+  rm -rf node_modules
+  npm install
+  ```
+
+
+- Ensure your `package.json` is intact and dependencies are not manually altered incorrectly.
+
+</Accordion>
+</AccordionGroup>
+
+---
+
+## 5. Best Practices and Tips
+
+- Always install dependencies after pulling new changes from the repository.
+- Lock your node version using `.nvmrc` or document the exact Node.js version to prevent inconsistency.
+- Run `npm audit` regularly to check for security issues in packages.
+
+---
+
+## 6. What’s Next?
+
+Once dependencies are installed correctly:
+
+1. Move on to the [Initializing Project & Environment](./getting-started/installation/first-project-setup) to configure your environment.
+2. Follow with [Configuring Firebase](./getting-started/configuration-run/firebase-setup) to prepare backend connectivity.
+
+<Check>
+Confirm that `npm install` completes without errors and that required packages are present before continuing.
+</Check>
+
+---
+
+For further assistance, refer to the [Troubleshooting Common Issues](./getting-started/troubleshooting-validation/common-issues) guide.
